@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%- include('../partials/header.ejs') %>
+<body>
+    <div class="container">
+        <h3>User Information</h3>
+    <% if(typeof customerData !='undefined' && customerData.length!=0){ 
+        var i=1; 
+        customerData.forEach(function(data){  %> 
+        <p>Account No: <%= data.account_no %></p>
+        <p>Name: <%= data.name %></p>
+        <p>NIC: <%= data.nic %></p>
+        <p>Address: <%= data.nic %></p>
+
+    <% })} %>     
+</div>
+    <%- include('../partials/footer.ejs') %>
+</body>
+</html>
