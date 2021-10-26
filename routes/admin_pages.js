@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/admin_auth_control');
-const customerManage = require('../controllers/customer_management');
+const adminTasks = require('../controllers/admin_tasks');
 
 router.get('/', authController.isLoggedIn, (req, res) => {
     if(req.user) {
@@ -23,7 +23,7 @@ router.get('/login', authController.isLoggedIn, (req, res) => {
 router.get('/customers', authController.isLoggedIn, (req, res) => {
     if(req.user) {
         res.locals.title = "Customer Management";
-        customerManage.viewAll(req,res);
+        adminTasks.viewAllCustomers(req,res);
     } else {
         res.redirect('./admin/login');
     }
@@ -31,7 +31,7 @@ router.get('/customers', authController.isLoggedIn, (req, res) => {
 
 router.get('/viewcustomer/:id', authController.isLoggedIn, (req,res)=>{
     if(req.user){
-        customerManage.view(req,res);
+        adminTasks.viewCustomer(req,res);
     }
     else {
         res.redirect('../login');
@@ -40,7 +40,7 @@ router.get('/viewcustomer/:id', authController.isLoggedIn, (req,res)=>{
 
 router.get('/customers/unregistered',authController.isLoggedIn, (req, res) => {
     if(req.user){
-        customerManage.viewUnregistered(req,res);
+        adminTasks.viewUnregisteredCustomer(req,res);
     }
     else {
         res.redirect('../login');
