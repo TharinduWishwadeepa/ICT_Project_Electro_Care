@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('./partials/header.ejs') %>
+
+    <body>
+        <div class="container col-md-4 mt-3">
+            <a href="/">Back</a>
+            <h4 class="text-center mb-4">Make a Complain</h4>
+
+            <form action="/make_complain" method="post">
+                <div class="mb-3">
+                    <label class="form-label">Complain Type</label>
+                    <select class="form-select" aria-label="Default select example" name="type">
+                        <option selected>Select Complain type</option>
+                        <option value="Power Cut">Power Cut</option>
+                        <option value="2">Two</option>
+                        <option value="3">Three</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Note</label>
+                    <textarea class="form-control" style="height: 150px" name="description"></textarea>
+                </div>
+                <% if (typeof message !="undefined" && message) { %>
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                      <%= message %>
+                    </div>
+                    <% } %>
+                <div class="col-6 mx-auto d-grid mb-3">
+                    <button type="submit" class="btn btn-primary">Submit Complain</button>
+                  </div>
+
+            </form>
+
+        </div>
+
+
+        <%- include('./partials/footer.ejs') %>
+    </body>
+
+</html>

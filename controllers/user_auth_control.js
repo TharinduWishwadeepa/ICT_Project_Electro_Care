@@ -57,6 +57,12 @@ exports.register = (req, res) => {
     conf_password,
   } = req.body;
 
+  if (!name || !account_no || !email || !mobile_no || !username || !password ||!conf_password) {
+    return res.status(400).render("register", {
+      message: "Please provide required fields",
+    });
+  }
+
   db.start.query(
     "SELECT username FROM customer WHERE username = ?",
     [username],
@@ -88,7 +94,7 @@ exports.register = (req, res) => {
                   message: "Passwords do not match!",
                 });
               } else {
-                let hashedPW = await bcrypt.hash(password, 8);
+                let hashedPW = await bcrypt.hash(password, 10);
                 db.start.query(
                   "UPDATE customer SET ? WHERE account_no = ?",
                   [
@@ -128,13 +134,13 @@ exports.register = (req, res) => {
 exports.isLoggedIn = async (req, res, next) => {
   if (req.cookies.jwt) {
     try {
-      // 1) verify token
+      // verify token
       const decoded = await promisify(jwt.verify)(
         req.cookies.jwt,
         process.env.JWT_SECRET
       );
 
-      // 2) Check if user still exists
+      // Check if user still exists
       db.start.query(
         "SELECT * FROM customer WHERE account_no = ?",
         [decoded.id],

@@ -1,10 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <%- include('./partials/header.ejs') %>
-<body>
-    <%- include('./partials/nav.ejs') %>
 
-    <a href="/user_auth/logout">logout</a>
-    <%- include('./partials/footer.ejs') %>
-</body>
+    <body>
+        <div class="container col-md-4 mt-3">
+            <a href="/user_auth/logout">logout</a>
+            <a href="/edit_user">Edit user</a>
+            <a href="/make_complain">Make Complain</a>
+            <h4>Total Amount Payable</h4>
+            <% if(typeof results !='undefined' && results) { %>
+                <p>Rs. <%= results[0].balance %>
+                </p>
+                <% } %>
+        </div>
+
+
+        <%- include('./partials/footer.ejs') %>
+    </body>
+
 </html>

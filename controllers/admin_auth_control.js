@@ -44,13 +44,13 @@ exports.login = async (req, res, next)=>{
 exports.isLoggedIn = async (req, res, next) => {
     if (req.cookies.jwt) {
       try {
-        // 1) verify token
+        // verify token
         const decoded = await promisify(jwt.verify)(
           req.cookies.jwt,
           process.env.JWT_SECRET
         );
   
-        // 2) Check if user still exists
+        //  Check if user still exists
         db.start.query('SELECT * FROM admin WHERE id = ?', [decoded.id], (error, result) => {
           if(!result) {
             return next();

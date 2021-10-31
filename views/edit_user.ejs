@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('./partials/header.ejs') %>
+
+    <body>
+        <div class="container col-md-4 mt-3">
+            <a href="/">Back</a>
+            <h4 class="text-center mb-4">Edit User Details</h4>
+
+            <form action="/update_user" method="post">
+                <% if(typeof results !='undefined' && results.length!=0){ %>
+                <div class="mb-3 form-floating">
+                    <input type="text" class="form-control" placeholder="Name" name="name" value="<%= results[0].name %> ">
+                    <label for="floatingInput">Name</label>
+                  </div>
+                  <div class="mb-3 form-floating">
+                    <input type="text" class="form-control" placeholder="NIC" name="nic" value="<%= results[0].nic %>">
+                    <label for="floatingInput">NIC</label>
+                  </div>
+                  <div class="mb-3 form-floating">
+                    <input type="text" class="form-control" placeholder="Address" name="address" value="<%= results[0].address %>">
+                    <label for="floatingInput">Address</label>
+                  </div>
+                  <div class="mb-3 form-floating">
+                    <input type="email" class="form-control" placeholder="Email" name="email" value="<%= results[0].email %>">
+                    <label for="floatingInput">Email</label>
+                  </div>
+                  <div class="mb-3  form-floating">
+                    <input type="text" class="form-control" placeholder="Mobile No." name="mobile_no" value="<%= results[0].mobile_no %>">
+                    <label for="floatingInput">Mobile No.</label>
+                  </div>
+                  <% } %> 
+                  <% if (typeof message !="undefined" && message) { %>
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                      <%= message %>
+                    </div>
+                    <% } %>
+                  <div class="col-6 mx-auto d-grid mt-5">
+                    <button type="submit" class="btn btn-primary">Update</button>
+                  </div>
+            </form>
+        </div>
+
+
+        <%- include('./partials/footer.ejs') %>
+    </body>
+
+</html>
