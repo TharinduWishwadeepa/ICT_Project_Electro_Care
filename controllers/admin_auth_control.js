@@ -1,4 +1,3 @@
-const mysql = require("mysql");
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { promisify } = require('util');
@@ -11,13 +10,15 @@ exports.login = async (req, res, next)=>{
         const {username, password} = req.body;
         if(!username || !password){
             return res.status(400).render('admin/login',{
-                message:"Please provide the username and password"
+                message:"Please provide the username and password",
+                title: 'Admin Login',
             })
         }
         db.start.query('SELECT * FROM admin WHERE username = ?',[username], async (error, results)=>{
             if(!results || !(await bcrypt.compare(password, results[0].password))){
                 res.status(401).render('admin/login',{
-                    message:"Username or Password is incorrect!"
+                    message:"Username or Password is incorrect!",
+                    title: 'Admin Login',
                 })
             }
             else{

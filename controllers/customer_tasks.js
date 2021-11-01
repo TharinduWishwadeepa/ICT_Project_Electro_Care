@@ -14,7 +14,6 @@ exports.getAccountNo = (req, res) => {
 
 //get area_id
 exports.getAreaID = (account_no, callback) => {
-  //  let account_no = this.getAccountNo(req,res);
   try {
     db.start.query(
       "SELECT area_id FROM customer WHERE account_no = ?",
@@ -31,6 +30,7 @@ exports.getAreaID = (account_no, callback) => {
     console.log(error);
   }
 };
+
 //get balance
 exports.getBalance = (account_no, callback) => {
   try {
@@ -77,7 +77,7 @@ exports.updateUser = (req, res) => {
   if (!name || !email || !address || !nic || !mobile_no) {
     return res.status(400).render("edit_user", {
       message: "Please provide required fields",
-      title:'Edit',
+      title: "Edit",
     });
   }
 
@@ -106,7 +106,7 @@ exports.updateUser = (req, res) => {
                   res.render("edit_user", {
                     results,
                     message: "User Updated Successfully!",
-                    title:'Edit',
+                    title: "Edit",
                   });
                 } else {
                   res.status(400).render("edit_user", {
@@ -132,29 +132,95 @@ exports.updateUser = (req, res) => {
 exports.makeComplain = (req, res) => {
   let { type, description } = req.body;
   let account_no = this.getAccountNo(req, res);
-  this.getAreaID(account_no,(error,results)=>{
-      let area_id = results[0].area_id;
-      try {
-        db.start.query("INSERT INTO complain SET ?", [
-            {
-              type: type,
-              description: description,
-              account_no: account_no,
-              area_id: area_id,
-              status: "Pending",
-            }],(error,results)=>{
-                if(!error){
-                    return res.render("make_complain", {
-                        message: "Complain Added Successfully!",
-                        title: "Make Complain",
-                      });
-                }
-                else{
-                    console.log(error);
-                }
-            })
-      } catch (error) {
-        console.log(error);
-      }
-  })
+  if (!type || type == "Select Complain type" || !description) {
+    return res.status(400).render("make_complain", {
+      messageWarning: "Please provide required details",
+      title: "Make Complain",
+    });
+  }
+  this.getAreaID(account_no, (error, results) => {
+    let area_id = results[0].area_id;
+    try {
+      db.start.query(
+        "INSERT INTO complain SET ?",
+        [
+          {
+            type: type,
+            description: description,
+            account_no: account_no,
+            area_id: area_id,
+            status: "Pending",
+          },
+        ],
+        (error, results) => {
+          if (!error) {
+            return res.render("make_complain", {
+              message: "Complain Added Successfully!",
+              title: "Make Complain",
+            });
+          } else {
+            console.log(error);
+          }
+        }
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  });
 };
+
+//change password
+exports.changePW = (req, res) => {
+  let { current_pw, new_pw, confirm_pw } = req.body;
+
+  let account_no = this.getAccountNo(req, res);
+  try {
+    if (!current_pw || !new_pw || !confirm_pw) {
+      return res.status(400).render("change_password", {
+        messageWarning: "Please provide required details",
+        title: "Change Password",
+      });
+    }
+    if (new_pw != confirm_pw) {
+      return res.status(400).render("change_password", {
+        messageWarning: "New Passwords do not match",
+        title: "Change Password",
+      });
+    }
+    db.start.query(
+      "SELECT password FROM customer WHERE account_no = ?",
+      [account_no],
+      async (error, results) => {
+        if (!error) {
+          if (!(await bcrypt.compare(current_pw, results[0].password))) {
+            return res.status(400).render("change_password", {
+              messageWarning: "Current Password is incorrect",
+              title: "Change Password",
+            });
+          } else {
+            let hashedPW = await bcrypt.hash(new_pw, 10);
+            db.start.query(
+              "UPDATE customer SET password =?",
+              [hashedPW],
+              (error, results) => {
+                if (!error) {
+                  return res.status(200).render("change_password", {
+                    message: "Password Updated",
+                    title: "Change Password",
+                  });
+                }
+              }
+            );
+          }
+        }
+      }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//upload image
+exports.uploadImage = (req,res)=>{
+  
+}

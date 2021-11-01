@@ -1,0 +1,25 @@
+<div class="mb-3 form-floating">
+    <input type="password" class="form-control" placeholder="Current Password" name="current_pw">
+    <label for="floatingInput">Current Password</label>
+</div>
+<div class="mb-3 form-floating">
+    <input type="password" class="form-control" placeholder="New Password" name="new_pw">
+    <label for="floatingInput">New Password</label>
+</div>
+<div class="mb-3 form-floating">
+    <input type="password" class="form-control" placeholder="Confirm New Password" name="confirm_pw">
+    <label for="floatingInput">Confirm New Password</label>
+</div>
+<% if (typeof messageWarning !="undefined" && messageWarning) { %>
+    <div class="alert alert-danger" role="alert">
+        <%= messageWarning %>
+    </div>
+    <% } %>
+        <% if (typeof message !="undefined" && message) { %>
+            <div class="alert alert-success" role="alert">
+                <%= message %>
+            </div>
+            <% } %>
+                <div class="col-6 mx-auto d-grid mb-3">
+                    <button type="submit" class="btn btn-primary">Change Password</button>
+                </div>

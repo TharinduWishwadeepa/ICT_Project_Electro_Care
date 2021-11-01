@@ -11,7 +11,8 @@ exports.login = async (req, res, next) => {
     const { username, password } = req.body;
     if (!username || !password) {
       return res.status(400).render("login", {
-        message: "Please provide the username and password",
+        messageWarning: "Please provide the username and password",
+        title:"Customer Login",
       });
     }
     db.start.query(
@@ -23,7 +24,8 @@ exports.login = async (req, res, next) => {
           !(await bcrypt.compare(password, results[0].password))
         ) {
           res.status(401).render("login", {
-            message: "Username or Password is incorrect!",
+            messageWarning: "Username or Password is incorrect!",
+            title:"Customer Login",
           });
         } else {
           const id = results[0].account_no;
@@ -59,7 +61,8 @@ exports.register = (req, res) => {
 
   if (!name || !account_no || !email || !mobile_no || !username || !password ||!conf_password) {
     return res.status(400).render("register", {
-      message: "Please provide required fields",
+      messageWarning: "Please provide required fields",
+      title : "Customer Register",
     });
   }
 
@@ -72,7 +75,8 @@ exports.register = (req, res) => {
       }
       if (results.length > 0) {
         return res.render("register", {
-          message: "That username already in use!",
+          messageWarning: "That username already in use!",
+          title : "Customer Register",
         });
       } else {
         db.start.query(
@@ -87,11 +91,13 @@ exports.register = (req, res) => {
               if (!(results[0].username == "" && results[0].password == "")) {
                 //if registered
                 return res.render("register", {
-                  message: "Already registered!",
+                  messageWarning: "Already registered!",
+                  title : "Customer Register",
                 });
               } else if (password != conf_password) {
                 return res.render("register", {
-                  message: "Passwords do not match!",
+                  messageWarning: "Passwords do not match!",
+                  title : "Customer Register",
                 });
               } else {
                 let hashedPW = await bcrypt.hash(password, 10);
@@ -112,7 +118,8 @@ exports.register = (req, res) => {
                       console.log(error);
                     } else {
                       return res.render("register", {
-                        messageS: "User registered!",
+                        message: "User registered!",
+                        title : "Customer Register",
                       });
                     }
                   }
@@ -120,7 +127,8 @@ exports.register = (req, res) => {
               }
             } else {
               return res.render("register", {
-                message: "Account is not available. Please contact us!",
+                messageWarning: "Account is not available. Please contact us!",
+                title : "Customer Register",
               });
             }
           }

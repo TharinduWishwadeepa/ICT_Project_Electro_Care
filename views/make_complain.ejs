@@ -26,6 +26,11 @@
                       <%= message %>
                     </div>
                     <% } %>
+                    <% if (typeof messageWarning !="undefined" && messageWarning) { %>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                          <%= messageWarning %>
+                        </div>
+                        <% } %>
                 <div class="col-6 mx-auto d-grid mb-3">
                     <button type="submit" class="btn btn-primary">Submit Complain</button>
                   </div>

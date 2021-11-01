@@ -35,14 +35,14 @@
           <label for="floatingInput">Confirm Password</label>
         </div>
         <div>
-          <% if (typeof message !="undefined" && message) { %>
+          <% if (typeof messageWarning !="undefined" && messageWarning) { %>
             <div class="alert alert-danger" role="alert">
-              <%= message %>
+              <%= messageWarning %>
             </div>
             <% } %>
-              <% if (typeof messageS !="undefined" && messageS) { %>
+              <% if (typeof message !="undefined" && message) { %>
                 <div class="alert alert-success" role="alert">
-                  <%= messageS %>
+                  <%= message %>
                 </div>
                 <% } %>
 

@@ -54,7 +54,18 @@ router.get("/make_complain", authController.isLoggedIn, (req, res) => {
     res.redirect("/");
   }
 });
+
+router.get("/change_password", authController.isLoggedIn, (req, res) => {
+  if (req.user) {
+    res.locals.title = "Change Password";
+    res.render("change_password");
+} else {
+    res.redirect("/");
+  }
+});
+
 router.post("/update_user", customerTasks.updateUser);
 router.post("/make_complain", customerTasks.makeComplain);
+router.post('/change_password', customerTasks.changePW);
 
 module.exports = router;
