@@ -5,11 +5,25 @@
     <body>
         <div class="container col-md-4 mt-3">
             <a href="/">Back</a>
-            <h3 class="text-center mb-5">Change Password</h3>
-            <form action="/upload_image" method="post">
-                <input type="file" accept="image/*" capture="environment">
+            <h3 class="text-center mb-5">Upload Meter Reading</h3>
+            <form action="/upload_image" method="POST" enctype="multipart/form-data">
+                <input type="file" accept="image/*" capture="environment" name="photo">
+                <div class="col-6 mx-auto d-grid mb-3">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                  </div>
+                  <% if (typeof messageWarning !="undefined" && messageWarning) { %>
+                    <div class="alert alert-danger" role="alert">
+                      <%= messageWarning %>
+                    </div>
+                    <% } %>
             </form>
+            <% if (typeof meterReading !="undefined" && meterReading) { %>
+              <div class="alert alert-success" role="alert">
+                <%= meterReading %>
+              </div>
+              <% } %>
         </div>
+
         <%- include('./partials/footer.ejs') %>
     </body>
 

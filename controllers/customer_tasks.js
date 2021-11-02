@@ -1,6 +1,13 @@
 const db = require("../model/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+var cloudinary = require('cloudinary').v2;
+cloudinary.config({ 
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
+  api_key: process.env.CLOUDINARY_API_KEY, 
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+  secure: true
+});
 
 //get account_no of logged in user
 exports.getAccountNo = (req, res) => {
@@ -12,11 +19,11 @@ exports.getAccountNo = (req, res) => {
   }
 };
 
-//get area_id
-exports.getAreaID = (account_no, callback) => {
+//get user details
+exports.getCustomerData = (account_no, callback) => {
   try {
     db.start.query(
-      "SELECT area_id FROM customer WHERE account_no = ?",
+      "SELECT area_id,balance FROM customer WHERE account_no = ?",
       [account_no],
       (error, results) => {
         if (!error) {
@@ -31,24 +38,6 @@ exports.getAreaID = (account_no, callback) => {
   }
 };
 
-//get balance
-exports.getBalance = (account_no, callback) => {
-  try {
-    db.start.query(
-      "SELECT balance from customer WHERE account_no = ?",
-      [account_no],
-      (error, results) => {
-        if (!error) {
-          return callback(null, results);
-        } else {
-          return callback(error, null);
-        }
-      }
-    );
-  } catch (error) {
-    console.log(error);
-  }
-};
 
 //edit user - Send the editing data to the form
 exports.editUser = (req, res) => {
@@ -138,7 +127,7 @@ exports.makeComplain = (req, res) => {
       title: "Make Complain",
     });
   }
-  this.getAreaID(account_no, (error, results) => {
+  this.getCustomerData(account_no, (error, results) => {
     let area_id = results[0].area_id;
     try {
       db.start.query(
@@ -220,7 +209,77 @@ exports.changePW = (req, res) => {
   }
 };
 
-//upload image
-exports.uploadImage = (req,res)=>{
-  
+//send image to nanonets and get result
+exports.getOCR = (urlimg,callback)=>{
+  var request = require('request')
+  var querystring = require('querystring')
+  const form_data = {'urls' : [urlimg]}
+  const options = {
+      url : 'https://app.nanonets.com/api/v2/OCR/Model/8c1dfbf1-1e5c-4a34-87c7-f99d6b200034/LabelUrls/',
+      body: querystring.stringify(form_data),
+      headers: {
+          'Authorization' : 'Basic ' + Buffer.from('mbVSBBs6tQB8S-AEbDrd7NS0zkad2N9Q' + ':').toString('base64'),
+          'Content-Type': 'application/x-www-form-urlencoded'
+      }
+  }
+  request.post(options, function(err, httpResponse, body) {
+    if (!err) {
+      return callback(null, body);
+    } else {
+      return callback(err, null);
+    }
+     
+  });
+
+  }
+
+//upload image and get OCR result
+exports.uploadImage = (req,res,next)=>{
+  var file;
+    if(!req.files)
+    {
+        console.log("File was not found");
+    }
+
+    file = req.files.photo;  
+    var url;
+    cloudinary.uploader.upload(file.tempFilePath ,(error,results)=>{
+      if(!error){
+        url = results.secure_url;
+        this.getOCR(url,(err,body)=>{
+          if(err){
+            console.log("eroor");
+          }
+          else{
+            const resultObj = JSON.parse(body);
+            
+            if(resultObj.result[0].prediction.length === 0){ // if there is no result
+              res.render("upload_image", { 
+                messageWarning: "Cannot Get Reading",
+                title : "Upload Meter Reading" });  
+            }
+            else{ // if there is a result
+              var meterReading = resultObj.result[0].prediction[0].ocr_text;
+              if(meterReading.length < 5){ //if the reading length is less than 5
+                res.render("upload_image", { 
+                  messageWarning: "Invalid Reading",
+                  title : "Upload Meter Reading" }); 
+              }
+              else{
+                meterReading = meterReading.slice(0, 5);
+                res.render("upload_image", { meterReading,
+                title : "Upload Meter Reading"});
+              } 
+            }	           
+          }
+        });   
+      
+      }
+      else{
+        console.log(error);
+      }
+
+    })
 }
+
+

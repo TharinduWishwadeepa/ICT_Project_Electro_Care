@@ -8,7 +8,7 @@ router.get("/", authController.isLoggedIn, (req, res) => {
     res.locals.title = "Welcome";
     //Get the balance of the user to display in index
     let account_no = customerTasks.getAccountNo(req, res);
-    customerTasks.getBalance(account_no, (error, results) => {
+    customerTasks.getCustomerData(account_no, (error, results) => {
       if (error) {
         console.log("eroor");
       } else {
@@ -64,8 +64,18 @@ router.get("/change_password", authController.isLoggedIn, (req, res) => {
   }
 });
 
+router.get("/upload_image", authController.isLoggedIn, (req, res) => {
+  if (req.user) {
+    res.locals.title = "Upload Meter Reading";
+    res.render("upload_image");
+} else {
+    res.redirect("/");
+  }
+});
+
 router.post("/update_user", customerTasks.updateUser);
 router.post("/make_complain", customerTasks.makeComplain);
 router.post('/change_password', customerTasks.changePW);
+router.post('/upload_image', customerTasks.uploadImage);
 
 module.exports = router;

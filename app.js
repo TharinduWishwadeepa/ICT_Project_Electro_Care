@@ -3,7 +3,7 @@ const dotenv = require('dotenv');
 const path = require('path');
 const { urlencoded } = require('express');
 const cookieParser = require('cookie-parser')
-
+const fileUpload = require('express-fileupload');
 dotenv.config({path:'./.env'});
 const app = express();
 const db = require('./model/db');
@@ -15,6 +15,9 @@ db.start.connect((error)=>{
 })
 app.set('view engine','ejs');
 
+app.use(fileUpload({
+    useTempFiles:true
+}));
 
 //parse URL encoded bodies (sent by HTML forms)
 app.use(express.urlencoded({extended: false}));
