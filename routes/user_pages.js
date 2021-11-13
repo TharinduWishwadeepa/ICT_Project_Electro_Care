@@ -46,6 +46,7 @@ router.get("/edit_user", authController.isLoggedIn, (req, res) => {
     res.redirect("/");
   }
 });
+
 router.get("/make_complain", authController.isLoggedIn, (req, res) => {
   if (req.user) {
     res.locals.title = "Make Complain";
@@ -68,6 +69,15 @@ router.get("/upload_image", authController.isLoggedIn, (req, res) => {
   if (req.user) {
     res.locals.title = "Upload Meter Reading";
     res.render("upload_image");
+} else {
+    res.redirect("/");
+  }
+});
+
+router.get('/view_bill', authController.isLoggedIn, (req, res) => {
+  if (req.user) {
+    res.locals.title = "View Bill";
+    res.render("view_bill");
 } else {
     res.redirect("/");
   }

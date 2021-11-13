@@ -32,9 +32,6 @@ app.use('/',require('./routes/user_pages'));
 app.use('/admin',require('./routes/admin_pages'));
 app.use('/user_auth',require('./routes/user_auth'));
 app.use('/admin/admin_auth',require('./routes/admin_auth'));
-//app.use('/admin/customers/edit_customer/:id', require('./routes/admin_pages'));
-app.use('/admin/view_customer/:id', require('./routes/admin_pages'));
-
 
 //public dir
 const publicDir = path.join(__dirname,'./public');

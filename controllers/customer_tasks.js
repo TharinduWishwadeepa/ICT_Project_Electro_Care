@@ -2,6 +2,8 @@ const db = require("../model/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 var cloudinary = require('cloudinary').v2;
+
+//cloudinary configuration
 cloudinary.config({ 
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
   api_key: process.env.CLOUDINARY_API_KEY, 
@@ -23,7 +25,7 @@ exports.getAccountNo = (req, res) => {
 exports.getCustomerData = (account_no, callback) => {
   try {
     db.start.query(
-      "SELECT area_id,balance FROM customer WHERE account_no = ?",
+      "SELECT name, area_id, balance, tariff, current_reading FROM customer WHERE account_no = ?",
       [account_no],
       (error, results) => {
         if (!error) {
@@ -37,7 +39,6 @@ exports.getCustomerData = (account_no, callback) => {
     console.log(error);
   }
 };
-
 
 //edit user - Send the editing data to the form
 exports.editUser = (req, res) => {
@@ -158,6 +159,42 @@ exports.makeComplain = (req, res) => {
   });
 };
 
+//view complain
+exports.viewComplain = (req,res)=>{
+  try {
+    let account_no = this.getAccountNo(req, res);
+    db.start.query('SELECT * FROM complain WHERE status = pending AND account_no = ? ORDER BY datetime DESC ',
+    [account_no],(error,results)=>{
+      if(!error){
+        console.log(results);
+        //render
+      }
+      else{
+        console.log(error);
+      }
+    })
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+//get pricings
+exports.getPricing = (tariff,callback)=>{
+  try {
+    db.start.query('SELECT * FROM pricing WHERE tariff = ?',[tariff],(error,results)=>{
+      if(!error){
+        return callback(null, results);
+      }
+      else{
+        return callback(error, null);
+      }
+    })
+    
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 //change password
 exports.changePW = (req, res) => {
   let { current_pw, new_pw, confirm_pw } = req.body;
@@ -209,7 +246,7 @@ exports.changePW = (req, res) => {
   }
 };
 
-//send image to nanonets and get result
+//Nanonets OCR API
 exports.getOCR = (urlimg,callback)=>{
   var request = require('request')
   var querystring = require('querystring')
@@ -233,7 +270,7 @@ exports.getOCR = (urlimg,callback)=>{
 
   }
 
-//upload image and get OCR result
+//upload image and get OCR result, analyze the reading before confirm
 exports.uploadImage = (req,res,next)=>{
   var file;
     if(!req.files)
@@ -241,34 +278,51 @@ exports.uploadImage = (req,res,next)=>{
         console.log("File was not found");
     }
 
-    file = req.files.photo;  
+    file = req.files.photo;  //get the image from form
     var url;
-    cloudinary.uploader.upload(file.tempFilePath ,(error,results)=>{
+    cloudinary.uploader.upload(file.tempFilePath ,(error,results)=>{//upload the image
       if(!error){
-        url = results.secure_url;
-        this.getOCR(url,(err,body)=>{
+        url = results.secure_url; // get URL of uploaded image
+
+        this.getOCR(url,(err,body)=>{ //send URL to Nanonets OCR API
           if(err){
-            console.log("eroor");
+            console.log(error);
           }
           else{
-            const resultObj = JSON.parse(body);
+            const resultObj = JSON.parse(body); //get the JSON Result of OCR
             
             if(resultObj.result[0].prediction.length === 0){ // if there is no result
               res.render("upload_image", { 
                 messageWarning: "Cannot Get Reading",
-                title : "Upload Meter Reading" });  
+                title : "Upload Meter Reading" }); 
             }
             else{ // if there is a result
-              var meterReading = resultObj.result[0].prediction[0].ocr_text;
-              if(meterReading.length < 5){ //if the reading length is less than 5
+              var meterReading = resultObj.result[0].prediction[0].ocr_text; //get original result
+              let account_no = this.getAccountNo(req, res); //get account_no
+              let current_reading;
+              this.getCustomerData(account_no, (error, results) => {
+                if (error) {
+                  console.log(error);
+                } else {
+                  current_reading = results[0].current_reading; //get current reading
+                }
+              });
+              meterReadingFormatted = meterReading.slice(0, 5); // get 1st 5 digits from meterReading
+              //if the reading length is less than 5  
+              if(meterReading.length < 5 ){ 
                 res.render("upload_image", { 
                   messageWarning: "Invalid Reading",
-                  title : "Upload Meter Reading" }); 
+                  title : "Upload Meter Reading" });
+              }  
+              //if meter reading is less than current_reading
+              else if(meterReadingFormatted < current_reading){
+                res.render("upload_image", { 
+                  messageWarning: "Invalid Reading",
+                  title : "Upload Meter Reading" });   
               }
-              else{
-                meterReading = meterReading.slice(0, 5);
-                res.render("upload_image", { meterReading,
-                title : "Upload Meter Reading"});
+              else{//if no problem with the reading
+                res.render("confirm_reading", { meterReadingFormatted,
+                title : "Confirm Meter Reading"});
               } 
             }	           
           }
@@ -282,4 +336,55 @@ exports.uploadImage = (req,res,next)=>{
     })
 }
 
+//confirm and generate bill
+exports.confirmReading = (req,res)=>{
+  try {
+    
+    //need to get pricing table
+    
+  } catch (error) {
+    
+  }
+}
 
+//view bill
+exports.viewBill = (req,res)=>{
+  try {
+    let account_no = this.getAccountNo(req,res);
+    
+    //select bill of current month
+    db.start.query('SELECT * FROM bill WHERE account_no = ? AND ( MONTH(date_of_bill) = MONTH(CURRENT_DATE()) AND YEAR(date_of_bill) = YEAR(CURRENT_DATE()) )'
+    ,[account_no],(error,bill_results)=>{
+      if(bill_results.length == 0){
+        // if there is no bill
+        res.render('view_bill',
+        {messageWarning:'There is no bill for this month. Please submit the meter reading for this month'})
+      }
+
+      else if (bill_results.length > 1){
+        // if there is a bill
+        console.log(bill_results[0]);
+        //get customer data
+        this.getCustomerData(account_no,(error,customer_data)=> {
+          if (error) {
+            console.log(error);
+          } else {
+            //get pricings
+            this.getPricing(customer_data[0].tariff,(error,pricing_results)=>{
+              if(!error){
+                //display bill
+                res.render('view_bill',{customer_data, pricing_results, bill_results,
+                title:'View Bill' });
+                console.log(pricing_results);
+              }
+            })}
+        });
+      }
+      else if(error){
+        console.log(error);
+      }
+    })
+  } catch (error) {
+    console.log(error);
+  }
+}

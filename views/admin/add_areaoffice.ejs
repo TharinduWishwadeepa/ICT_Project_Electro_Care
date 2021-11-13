@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%- include('../partials/header.ejs') %>
+<body>
+    
+    <div class="container col-md-5">
+        <h4 class="text-center">Add Area Office</h4>
+        <form action="/admin/add_areaoffice" method="POST">
+            <div class="mb-3 form-floating">
+                <input type="text" class="form-control" placeholder="Area ID" name="area_id" required >
+                <label for="floatingInput">Area ID</label>
+              </div>
+              <div class="mb-3 form-floating">
+                <input type="text" class="form-control" placeholder="Area Name" name="area_name" required >
+                <label for="floatingInput">Area Name</label>
+              </div>
+              <div class="mb-3 form-floating">
+                <input type="password" class="form-control" placeholder="Password" name="password">
+                <label for="floatingInput">Password</label>
+              </div>
+              <div class="mb-3 form-floating">
+                <input type="password" class="form-control" placeholder="Confirm Password" name="conf_password">
+                <label for="floatingInput">Confirm Password</label>
+              </div>
+              <div class="mb-3 form-floating">
+                <textarea class="form-control" placeholder="Address" name="address" style="height: 100px" required ></textarea>
+                <label for="floatingInput">Address</label>
+              </div>
+              <div class="mb-3 form-floating">
+                <input type="tel" class="form-control" placeholder="Telephone No" name="telephone_no" required >
+                <label for="floatingInput">Telephone No</label>
+              </div>
+
+              <div class="form-floating mb-3">
+                <input class="form-control" list="distictList" id="exampleDataList" name="district" placeholder="Type to search...">
+                <datalist id="distictList" >
+                  <option value="Ampara">
+                  <option value="Anuradhapura">
+                  <option value="Badulla">
+                  <option value="Batticaloa">
+                  <option value="Colombo">
+                  <option value="Galle">
+                  <option value="Gampaha">
+                  <option value="Hambantota">
+                  <option value="Jaffna">
+                  <option value="Kalutara">
+                  <option value="Kandy">
+                  <option value="Kegalle">
+                  <option value="Kilinochchi">
+                  <option value="Kurunegala">          
+                  <option value="Mannar">
+                  <option value="Matale">
+                  <option value="Matara">
+                  <option value="Monaragala">
+                  <option value="Mullaitivu">
+                  <option value="Nuwara Eliya">
+                  <option value="Polonnaruwa">
+                  <option value="Puttalam">
+                  <option value="Ratnapura">
+                  <option value="Trincomalee">
+                  <option value="Vavuniya">      
+                </datalist>
+                <label for="floatingSelect">Select the District. Type to search...</label>
+              </div>
+
+              <div class="form-floating mb-3">
+                <input class="form-control" list="provinceList" name="province" id="exampleDataList" placeholder="Type to search...">
+                <datalist id="provinceList">
+                  <option value="Central">
+                  <option value="Eastern">
+                  <option value="North Central">
+                  <option value="Northern">
+                  <option value="North Western">
+                  <option value="Sabaragamuwa">
+                  <option value="Southern">
+                  <option value="Uva">
+                  <option value="Western"> 
+                </datalist>
+                <label for="floatingSelect">Select the Province. Type to search...</label>
+              </div>
+              <div>
+                <% if (typeof messageWarning !="undefined" && messageWarning) { %>
+                  <div class="alert alert-danger" role="alert">
+                    <%= messageWarning %>
+                  </div>
+                  <% } %>
+                    <% if (typeof message !="undefined" && message) { %>
+                      <div class="alert alert-success" role="alert">
+                        <%= message %>
+                      </div>
+                      <% } %>
+      
+              </div>
+              
+              <div class="col-6 mx-auto d-grid mt-5">
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </div>
+        </form>
+    </div>
+    <%- include('../partials/footer.ejs') %>
+</body>
+</html>

@@ -5,7 +5,7 @@ const { promisify } = require('util');
 const db = require('../model/db');
 
 //login
-exports.login = async (req, res, next)=>{
+exports.login = (req, res, next)=>{
     try {
         const {username, password} = req.body;
         if(!username || !password){

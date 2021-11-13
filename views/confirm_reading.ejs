@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('./partials/header.ejs') %>
+
+    <body>
+        <div class="container col-md-4 mt-3">
+            <h4>Confirm Meter Reading</h4>
+            <h5>Your reading is :  <% if (typeof meterReadingFormatted !="undefined" && meterReadingFormatted) { %>
+                    
+                        <%= meterReadingFormatted %>
+                    </h5>
+
+                    <form action="/confirm_reading" method="POST">
+                        <input type="hidden" name="meter_reading" value="<%= meterReadingFormatted %>">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="termsChkbx" onchange="isChecked(this, 'confirm')">
+                            <label class="form-check-label" for="termsChkbx">I confirm that the reading is correct</label>
+                          </div>
+                        
+                        <div class="col-6 mx-auto d-grid mb-3">
+                            <button type="submit" class="btn btn-primary" id="confirm" disabled>Confirm</button>
+                        </div>
+                    </form>
+                    <% } %>
+           
+        </div>
+
+
+        <%- include('./partials/footer.ejs') %>
+            <script>
+                //check the ckeckbox is checked
+                function isChecked(checkbox, confirm) {
+                    document.getElementById(confirm).disabled = !checkbox.checked;
+                }
+            </script>
+    </body>
+
+</html>

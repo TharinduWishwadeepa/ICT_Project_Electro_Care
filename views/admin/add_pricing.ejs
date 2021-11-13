@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%- include('../partials/header.ejs') %>
+<body>
+    
+    <div class="container mt-3 col-md-5">
+    <h4 class="text-center">Add Pricing </h4>
+    <form action="/admin/add_pricing" method="POST">
+        <div class="mb-3 form-floating">
+            <input type="text" class="form-control" placeholder="Tariff" name="tariff" required >
+            <label for="floatingInput">Tariff</label>
+          </div>
+          <div class="mb-3 form-floating">
+            <input type="text" class="form-control" placeholder="1 - 30" name="b1_30" required>
+            <label for="floatingInput">1 - 30</label>
+          </div>
+          <div class="mb-3 form-floating">
+            <input type="text" class="form-control" placeholder="31 - 60" name="b31_60" required>
+            <label for="floatingInput">31 - 60</label>
+          </div>
+          <div class="mb-3 form-floating">
+            <input type="text" class="form-control" placeholder="61 - 90" name="b61_90" required>
+            <label for="floatingInput">61 - 90</label>
+          </div>
+          <div class="mb-3 form-floating">
+            <input type="text" class="form-control" placeholder="91 - 105" name="b91_105" required >
+            <label for="floatingInput">91 - 105</label>
+          </div>
+          <div class="col-6 mx-auto d-grid mt-5">
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </div>
+    </form>
+</div>
+    <%- include('../partials/footer.ejs') %>
+</body>
+</html>

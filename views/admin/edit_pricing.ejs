@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%- include('../partials/header.ejs') %>
+<body>
+    
+    <div class="container col-md-5 mt-3">
+    <h4 class="text-center">Edit Pricing </h4>
+    <form action="/update_pricing" method="post">
+        <% if(typeof results !='undefined' && results.length!=0){ %>
+            <div class="mb-3 form-floating">
+                <input type="text" class="form-control" placeholder="Tariff" name="tariff" value="<%= results[0].tariff %>" readonly>
+                <label for="floatingInput">Tariff</label>
+              </div>
+              <div class="mb-3 form-floating">
+                <input type="text" class="form-control" placeholder="1 - 30" name="b1_30" value="<%= results[0].b1_30 %>">
+                <label for="floatingInput">1 - 30</label>
+              </div>
+              <div class="mb-3 form-floating">
+                <input type="text" class="form-control" placeholder="31 - 60" name="b31_60" value="<%= results[0].b31_60 %>">
+                <label for="floatingInput">31 - 60</label>
+              </div>
+              <div class="mb-3 form-floating">
+                <input type="text" class="form-control" placeholder="61 - 90" name="b61_90" value="<%= results[0].b61_90 %>">
+                <label for="floatingInput">61 - 90</label>
+              </div>
+              <div class="mb-3 form-floating">
+                <input type="text" class="form-control" placeholder="91- 105" name="b91_105" value="<%= results[0].b91_105 %>">
+                <label for="floatingInput">91- 105</label>
+              </div>
+              <% } %> 
+              <% if (typeof message !="undefined" && message) { %>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                  <%= message %>
+                </div>
+                <% } %>
+          <div class="col-6 mx-auto d-grid mt-5">
+            <button type="submit" class="btn btn-primary" >Update</button>
+          </div>
+    </form>
+</div>
+    <%- include('../partials/footer.ejs') %>
+</body>
+</html>

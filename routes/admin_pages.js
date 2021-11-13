@@ -10,7 +10,7 @@ router.get('/', authController.isLoggedIn, (req, res) => {
     } else {
         res.redirect('./admin/login');
     }  
-  });
+});
 
 router.get('/login', authController.isLoggedIn, (req, res) => {
     if(req.user ) {
@@ -20,12 +20,13 @@ router.get('/login', authController.isLoggedIn, (req, res) => {
         res.render('./admin/login');
     }
 });
+
 router.get('/customers', authController.isLoggedIn, (req, res) => {
     if(req.user) {
         res.locals.title = "Customer Management";
         adminTasks.viewAllCustomers(req,res);
     } else {
-        res.redirect('./admin/login');
+        res.redirect('./login');
     }
 });
 
@@ -40,11 +41,56 @@ router.get('/viewcustomer/:id', authController.isLoggedIn, (req,res)=>{
 
 router.get('/customers/unregistered',authController.isLoggedIn, (req, res) => {
     if(req.user){
+        res.locals.title = "Unregistered Customers";
         adminTasks.viewUnregisteredCustomer(req,res);
     }
     else {
         res.redirect('../login');
     }
-}  );
+});
+
+router.get('/pricings',authController.isLoggedIn,(req,res)=>{
+    if(req.user){
+        res.locals.title = "Electricity Pricings";
+        adminTasks.viewAllPricings(req,res);
+    }
+    else {
+        res.redirect('./login');
+    }
+});
+
+router.get('/add_pricing', authController.isLoggedIn,(req,res)=>{
+    if(req.user){
+        res.locals.title = "Add Pricing";
+        res.render('./admin/add_pricing');
+    }
+    else {
+        res.redirect('./login');
+    }
+});
+
+router.post('/add_pricing',adminTasks.addPricing);
+
+router.get('/edit_pricing/:id',authController.isLoggedIn,(req,res)=>{
+    if(req.user){
+        res.locals.title = "Edit Pricing";
+        adminTasks.editPricing(req,res);
+    }
+    else {
+        res.redirect('../login');
+    }
+});
+
+router.get('/add_areaoffice',authController.isLoggedIn,(req,res)=>{
+    if(req.user){
+        res.locals.title = "Add Area Office";
+        res.render('./admin/add_areaoffice');
+    }
+    else {
+        res.redirect('./login');
+    }
+});
+
+router.post('/add_areaoffice',adminTasks.addAreaOffice);
 
 module.exports = router;
