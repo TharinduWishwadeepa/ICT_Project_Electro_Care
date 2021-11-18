@@ -5,7 +5,7 @@
     
     <div class="container col-md-5 mt-3">
     <h4 class="text-center">Edit Pricing </h4>
-    <form action="/update_pricing" method="post">
+    <form action="/admin/update_pricing" method="post">
         <% if(typeof results !='undefined' && results.length!=0){ %>
             <div class="mb-3 form-floating">
                 <input type="text" class="form-control" placeholder="Tariff" name="tariff" value="<%= results[0].tariff %>" readonly>

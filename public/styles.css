@@ -1,0 +1,14 @@
+/* Style the meter reading */
+.meter-reading {
+	display: block;
+	margin: 2em auto;
+	border: none;
+	padding: 0;
+	color: #FECE2F;
+	width: 7.5ch;
+	background: repeating-linear-gradient(90deg, dimgrey 0, dimgrey 1ch, transparent 0, transparent 1.5ch) 0 100%/ 7ch 2px no-repeat;
+	font: 5ch droid sans mono, consolas, monospace;
+	letter-spacing: 0.5ch;
+  }
+  
+/* End of style the meter reading */

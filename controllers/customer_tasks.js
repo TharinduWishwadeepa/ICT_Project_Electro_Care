@@ -1,14 +1,14 @@
 const db = require("../model/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-var cloudinary = require('cloudinary').v2;
+var cloudinary = require("cloudinary").v2;
 
 //cloudinary configuration
-cloudinary.config({ 
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
-  api_key: process.env.CLOUDINARY_API_KEY, 
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
-  secure: true
+  secure: true,
 });
 
 //get account_no of logged in user
@@ -87,7 +87,6 @@ exports.updateUser = (req, res) => {
       (error, results) => {
         if (!error) {
           try {
-            let account_no = this.getAccountNo(req, res);
             db.start.query(
               "SELECT * FROM customer WHERE account_no = ?",
               [account_no],
@@ -145,8 +144,9 @@ exports.makeComplain = (req, res) => {
         (error, results) => {
           if (!error) {
             return res.render("make_complain", {
-              message: "Complain Added Successfully!",
               title: "Make Complain",
+              alert:"alert",
+              alertTitle:"Complain Added Successfully!"
             });
           } else {
             console.log(error);
@@ -160,40 +160,44 @@ exports.makeComplain = (req, res) => {
 };
 
 //view complain
-exports.viewComplain = (req,res)=>{
+exports.viewComplain = (req, res) => {
   try {
     let account_no = this.getAccountNo(req, res);
-    db.start.query('SELECT * FROM complain WHERE status = pending AND account_no = ? ORDER BY datetime DESC ',
-    [account_no],(error,results)=>{
-      if(!error){
-        console.log(results);
-        //render
+    db.start.query(
+      "SELECT * FROM complain WHERE status = pending AND account_no = ? ORDER BY datetime DESC ",
+      [account_no],
+      (error, results) => {
+        if (!error) {
+          console.log(results);
+          //render
+        } else {
+          console.log(error);
+        }
       }
-      else{
-        console.log(error);
-      }
-    })
+    );
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 //get pricings
-exports.getPricing = (tariff,callback)=>{
+exports.getPricing = (tariff, callback) => {
   try {
-    db.start.query('SELECT * FROM pricing WHERE tariff = ?',[tariff],(error,results)=>{
-      if(!error){
-        return callback(null, results);
+    db.start.query(
+      "SELECT * FROM pricing WHERE tariff = ? ",
+      [tariff.trim()],
+      (error, results) => {
+        if (!error) {  
+          return callback(null, results);
+        } else {
+          return callback(error, null);
+        }
       }
-      else{
-        return callback(error, null);
-      }
-    })
-    
+    );
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 //change password
 exports.changePW = (req, res) => {
@@ -246,144 +250,311 @@ exports.changePW = (req, res) => {
   }
 };
 
-//Nanonets OCR API
-exports.getOCR = (urlimg,callback)=>{
-  var request = require('request')
-  var querystring = require('querystring')
-  const form_data = {'urls' : [urlimg]}
+//Nanonets OCR API - get meter reading
+exports.getOCR = (urlimg, callback) => {
+  var request = require("request");
+  var querystring = require("querystring");
+  const form_data = { urls: [urlimg] };
   const options = {
-      url : 'https://app.nanonets.com/api/v2/OCR/Model/8c1dfbf1-1e5c-4a34-87c7-f99d6b200034/LabelUrls/',
-      body: querystring.stringify(form_data),
-      headers: {
-          'Authorization' : 'Basic ' + Buffer.from('mbVSBBs6tQB8S-AEbDrd7NS0zkad2N9Q' + ':').toString('base64'),
-          'Content-Type': 'application/x-www-form-urlencoded'
-      }
-  }
-  request.post(options, function(err, httpResponse, body) {
+    url: "https://app.nanonets.com/api/v2/OCR/Model/8c1dfbf1-1e5c-4a34-87c7-f99d6b200034/LabelUrls/",
+    body: querystring.stringify(form_data),
+    headers: {
+      Authorization:
+        "Basic " +
+        Buffer.from("mbVSBBs6tQB8S-AEbDrd7NS0zkad2N9Q" + ":").toString(
+          "base64"
+        ),
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  };
+  request.post(options, function (err, httpResponse, body) {
     if (!err) {
       return callback(null, body);
     } else {
       return callback(err, null);
     }
-     
   });
-
-  }
+};
 
 //upload image and get OCR result, analyze the reading before confirm
-exports.uploadImage = (req,res,next)=>{
+exports.uploadImage = (req, res, next) => {
   var file;
-    if(!req.files)
-    {
-        console.log("File was not found");
-    }
+  if (!req.files) {
+    console.log("File was not found");
+  }
 
-    file = req.files.photo;  //get the image from form
-    var url;
-    cloudinary.uploader.upload(file.tempFilePath ,(error,results)=>{//upload the image
-      if(!error){
-        url = results.secure_url; // get URL of uploaded image
+  file = req.files.photo; //get the image from form
+  var url;
+  cloudinary.uploader.upload(file.tempFilePath, (error, results) => {
+    //upload the image
+    if (!error) {
+      url = results.secure_url; // get URL of uploaded image
 
-        this.getOCR(url,(err,body)=>{ //send URL to Nanonets OCR API
-          if(err){
-            console.log(error);
-          }
-          else{
-            const resultObj = JSON.parse(body); //get the JSON Result of OCR
-            
-            if(resultObj.result[0].prediction.length === 0){ // if there is no result
-              res.render("upload_image", { 
-                messageWarning: "Cannot Get Reading",
-                title : "Upload Meter Reading" }); 
+      this.getOCR(url, (err, body) => {
+        //send URL to Nanonets OCR API
+        if (err) {
+          console.log(error);
+        } else {
+          let resultObj = JSON.parse(body); //get the JSON Result of OCR
+
+          if (resultObj.result[0].prediction.length === 0) {
+            // if there is no result
+            res.render("upload_image", {
+              messageWarning: "Cannot Get Reading",
+              title: "Upload Meter Reading",
+            });
+          } else {
+            // if there is a result
+            let meterReading = resultObj.result[0].prediction[0].ocr_text; //get original result
+            let account_no = this.getAccountNo(req, res); //get account_no
+            let current_reading;
+            let balance;
+            this.getCustomerData(account_no, (error, results) => {
+              if (error) {
+                console.log(error);
+              } else {
+                current_reading = results[0].current_reading; //get current reading
+                balance = results[0].balance; // get balance
+                customername = results[0].name; //get name
+              }
+            });
+            meterReadingFormatted = meterReading.slice(0, 5); // get 1st 5 digits from meterReading
+            //if the reading length is less than 5
+            if (meterReading.length < 5) {
+              res.render("upload_image", {
+                messageWarning: "Invalid Reading",
+                title: "Upload Meter Reading",
+              });
             }
-            else{ // if there is a result
-              var meterReading = resultObj.result[0].prediction[0].ocr_text; //get original result
-              let account_no = this.getAccountNo(req, res); //get account_no
-              let current_reading;
+            //if meter reading is less than current_reading
+            else if (meterReadingFormatted <= current_reading) {
+              res.render("upload_image", {
+                messageWarning: "Invalid Reading",
+                title: "Upload Meter Reading",
+              });
+            } else {
+              //if no problem with the reading
               this.getCustomerData(account_no, (error, results) => {
-                if (error) {
-                  console.log(error);
-                } else {
-                  current_reading = results[0].current_reading; //get current reading
+                if (!error) {
+                  let tariff = results[0].tariff;
+                  res.render("confirm_reading", {
+                    meterReadingFormatted,
+                    tariff,
+                    current_reading,
+                    account_no,
+                    balance,
+                    url,
+                    customername,
+                    title: "Confirm Meter Reading",
+                  });
                 }
               });
-              meterReadingFormatted = meterReading.slice(0, 5); // get 1st 5 digits from meterReading
-              //if the reading length is less than 5  
-              if(meterReading.length < 5 ){ 
-                res.render("upload_image", { 
-                  messageWarning: "Invalid Reading",
-                  title : "Upload Meter Reading" });
-              }  
-              //if meter reading is less than current_reading
-              else if(meterReadingFormatted < current_reading){
-                res.render("upload_image", { 
-                  messageWarning: "Invalid Reading",
-                  title : "Upload Meter Reading" });   
-              }
-              else{//if no problem with the reading
-                res.render("confirm_reading", { meterReadingFormatted,
-                title : "Confirm Meter Reading"});
-              } 
-            }	           
+            }
           }
-        });   
-      
-      }
-      else{
-        console.log(error);
-      }
+        }
+      });
+    } else {
+      console.log(error);
+    }
+  });
+};
 
-    })
-}
-
-//confirm and generate bill
-exports.confirmReading = (req,res)=>{
+//check if there is a bill for current month
+exports.checkBillThisMonth = (account_no,callback)=>{
   try {
-    
-    //need to get pricing table
-    
+    db.start.query("SELECT * FROM bill WHERE account_no = ? AND ( MONTH(date_of_bill) = MONTH(CURRENT_DATE()) AND YEAR(date_of_bill) = YEAR(CURRENT_DATE()) )",
+    [account_no],(error,results)=>{
+      let bill;
+      if (results.length == 0) {
+        // if there is no bill
+        bill = "no_bill";
+        return callback(null, bill );
+      }
+      else if(results.length == 1){
+        bill = "have_bill";
+        return callback(null, bill);
+      }
+    })
   } catch (error) {
     
   }
 }
-
-//view bill
-exports.viewBill = (req,res)=>{
+//confirm and generate bill
+exports.generateBill = (req, res) => {
+  let {
+    tariff,
+    meter_reading,
+    current_reading,
+    url,
+    balance,
+    account_no,
+    customername,
+  } = req.body;
+  account_no = account_no.trim();
+  console.log(req.body);
   try {
-    let account_no = this.getAccountNo(req,res);
+    //get pricing
+    this.getPricing(tariff, (error, results) => {
+      try {
+        if (error) {
+          console.log(error);
+        } else {
+          //get price for units used
+          let b1_30 = results[0].b1_30;
+          let b31_60 = results[0].b31_60;
+          let b61_90 = results[0].b61_90;
+          let b91_105 = results[0].b91_105;
+
+          let no_of_units = meter_reading - current_reading;
+          let total;
+          if (no_of_units > 0 && no_of_units < 31) {
+            total = b1_30 * no_of_units;
+          } else if (no_of_units > 31 && no_of_units < 61) {
+            let remainder = no_of_units - 30;
+            total = b1_30 * 30 + b31_60 * remainder;
+          } else if (no_of_units > 61 && no_of_units < 91) {
+            let remainder = no_of_units - 60;
+            total = b1_30 * 30 + b31_60 * 30 + b61_90 * remainder;
+          } else if (no_of_units > 91 && no_of_units < 106) {
+            let remainder = no_of_units - 90;
+            total =
+              b1_30 * 30 + b31_60 * 30 + b61_90 * 30 + b91_105 * remainder;
+          }
+          payableAmount = total + parseFloat(balance);
+          console.log("payable ", payableAmount);
+          var today = new Date();
+          var dateToday =
+            today.getFullYear() +
+            "-" +
+            (today.getMonth() + 1) +
+            "-" +
+            today.getDate();
+          var month = today.getFullYear() + "-" + (today.getMonth() + 1);
+          //add a bill
+          db.start.query(
+            "INSERT INTO bill SET ?",
+            [
+              {
+                account_no: account_no,
+                date_of_bill: dateToday,
+                reading: meter_reading,
+                total: total,
+                image: url,
+                markedby: account_no,
+              },
+            ],
+            (error, results) => {
+              if (!error) {
+                db.start.query(
+                  "UPDATE customer SET ?",
+                  [
+                    {
+                      balance: payableAmount,
+                      current_reading: meter_reading,
+                    },
+                  ],
+                  (error, results) => {
+                    if (!error) {
+                      return res.render("confirm_reading", {
+                        alert: "alert",
+                         alertTitle: "Success!",    
+                      });
+                    } else {
+                      console.log(error);
+                    }
+                  }
+                );
+              } else {
+                console.log(error);
+              }
+            }
+          );
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//view bill of this month
+exports.viewBill = (req, res) => {
+  try {
+    let account_no = this.getAccountNo(req, res);
     
     //select bill of current month
-    db.start.query('SELECT * FROM bill WHERE account_no = ? AND ( MONTH(date_of_bill) = MONTH(CURRENT_DATE()) AND YEAR(date_of_bill) = YEAR(CURRENT_DATE()) )'
-    ,[account_no],(error,bill_results)=>{
-      if(bill_results.length == 0){
-        // if there is no bill
-        res.render('view_bill',
-        {messageWarning:'There is no bill for this month. Please submit the meter reading for this month'})
+    db.start.query(
+      "SELECT * FROM bill WHERE account_no = ? AND ( MONTH(date_of_bill) = MONTH(CURRENT_DATE()) AND YEAR(date_of_bill) = YEAR(CURRENT_DATE()) )",
+      [account_no],
+      (error, bill_results) => {
+        
+        if (bill_results.length == 0) {
+          // if there is no bill
+          res.render("view_bill", {
+            messageWarning:
+              "There is no bill for this month. Please submit the meter reading for this month",
+          });
+        } else if (bill_results) {
+          // if there is a bill
+          total = bill_results[0].total;
+          //get customer data
+          this.getCustomerData(account_no, (error, customer_data) => {
+            if (error) {
+              console.log(error);
+            } else {
+              //get pricings
+              this.getPricing(
+                customer_data[0].tariff,
+                (error, pricing_results) => {
+                  if (!error) {
+                    //display bill
+                    res.render("view_bill", {
+                      total,
+                      customer_data,
+                      pricing_results,
+                      bill_results,
+                      title: "View Bill",
+                    });
+                    
+                  }
+                }
+              );
+            }
+          });
+        } else if (error) {
+          console.log(error);
+        }
       }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+};
 
-      else if (bill_results.length > 1){
-        // if there is a bill
-        console.log(bill_results[0]);
-        //get customer data
-        this.getCustomerData(account_no,(error,customer_data)=> {
-          if (error) {
-            console.log(error);
-          } else {
-            //get pricings
-            this.getPricing(customer_data[0].tariff,(error,pricing_results)=>{
-              if(!error){
-                //display bill
-                res.render('view_bill',{customer_data, pricing_results, bill_results,
-                title:'View Bill' });
-                console.log(pricing_results);
-              }
-            })}
-        });
+//view maintenances
+exports.viewMaintenances = (req,res)=>{
+  try {
+    let account_no = this.getAccountNo(req,res);
+    this.getCustomerData(account_no,(error,results)=>{
+      if(!error){
+        let area_id = results[0].area_id;
+        db.start.query("SELECT * FROM maintenance WHERE area_id = ? AND (date >= DATE_ADD(NOW(), INTERVAL -2 MONTH))",
+    [area_id],(error,results)=>{
+      if(!error){
+        return res.render('view_maintenances',{results});
       }
-      else if(error){
+      else{
         console.log(error);
       }
     })
+      }
+      else{
+        console.log(error);
+      }
+    })
+    
   } catch (error) {
     console.log(error);
   }

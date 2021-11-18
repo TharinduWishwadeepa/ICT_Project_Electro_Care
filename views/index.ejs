@@ -3,18 +3,43 @@
 <%- include('./partials/header.ejs') %>
 
     <body>
-        <div class="container col-md-4 mt-3">
-            <a href="/user_auth/logout">logout</a>
-            <a href="/edit_user">Edit user</a>
-            <a href="/make_complain">Make Complain</a>
-            <a href="/change_password">Change Password</a>
-            <h4>Total Amount Payable</h4>
-            <% if(typeof results !='undefined' && results) { %>
-                <p>Rs. <%= results[0].balance %>
-                </p>
-                <% } %>
+        <div class="container col-md-4 mt-4">
+            <div class="row mb-3">
+                <div class="col-1"><h3><i class="bi bi-list"></i></h3></div>
+                <div class="col-9 text-center"><h3>Hi, Perera!</h3></div>
+                <div class="col-2 text-start"><h3 style="color: #FECE2F;"><i class="bi bi-bell" ></i></h3></div>
+            </div>
+            
+            <div class="card shadow p-3 mb-3" style=" border-radius: 25px;background-color: #FECE2F;">
+                <div class="card-body text-center">
+                    <h5 class="text-center">Submit Your Meter Reading</h5>
+                    <div class="pt-3">
+                    <a href="/upload_image" type="button" class="btn btn-secondary rounded-pill">Submit Reading</a>
+                </div>       
+                </div>
+              </div>
+            <div class="card shadow p-3 mb-3" style="border-radius: 25px;background-color: #FECE2F;">
+                <div class="card-body text-center">
+                    <h5 class="text-center">Total Amount Payable</h5>
+                    <% if(typeof results !='undefined' && results) { %>
+                        <h2 class="pt-3"><span style="font-size:medium;">Rs. </span><%= results[0].balance %>
+                        </h2>
+                        <% } %>
+                        <div class="pt-3">
+                        <a href="" type="button" class="btn btn-secondary rounded-pill" >Pay Now</a>
+                        <a href="" type="button" class="btn btn-secondary rounded-pill">View Bills</a>
+                    </div>
+                </div>
+              </div>
+              <a href="/user_auth/logout">logout</a>
+              <a href="/edit_user">Edit user</a>
+              <a href="/make_complain">Make Complain</a>
+              <a href="/change_password">Change Password</a><br>
+              
+              <a href="/view_bill">View Bill</a>
+              <a href="/view_maintenances">View Bill</a>
+                
         </div>
-
 
         <%- include('./partials/footer.ejs') %>
     </body>

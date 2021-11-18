@@ -6,7 +6,8 @@
         <div class="container col-md-4 mt-3">
             <a href="/">Back</a>
             <h4>E Bill</h4>
-            
+           <% if (typeof total !="undefined" && total) { %> Total Of Bill: <%= total %><% } %><br>
+           <% if (typeof customer_data !="undefined" && customer_data) { %> Total Payable: <%= customer_data[0].balance %><% } %>
         </div>
 
 

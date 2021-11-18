@@ -7,7 +7,8 @@
             <a href="/">Back</a>
             <h3 class="text-center mb-5">Upload Meter Reading</h3>
             <form action="/upload_image" method="POST" enctype="multipart/form-data">
-                <input type="file" accept="image/*" capture="environment" name="photo">
+                <input type="file" accept="image/*" capture="environment" name="photo" id="file">
+                
                 <div class="col-6 mx-auto d-grid mb-3">
                     <button type="submit" class="btn btn-primary">Submit</button>
                   </div>
@@ -19,7 +20,21 @@
             </form>
             
         </div>
-
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <% if (typeof alert != "undefined" && alert) { %>
+            <script>
+             const el = document.createElement('div')
+                el.innerHTML = "<a href='/'><button class='btn btn-success'>Go to Home Page</button></a>"
+             swal({
+                title: "<%= alertTitle %>",
+                icon: "info",
+                button: false,
+                text:"You have submitted the meter Reading for this month",
+                closeOnClickOutside: false,
+                content: el,
+                });
+           </script>
+           <% } %>
         <%- include('./partials/footer.ejs') %>
     </body>
 

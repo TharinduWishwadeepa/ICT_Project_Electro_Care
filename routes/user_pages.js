@@ -67,8 +67,18 @@ router.get("/change_password", authController.isLoggedIn, (req, res) => {
 
 router.get("/upload_image", authController.isLoggedIn, (req, res) => {
   if (req.user) {
+    let account_no = customerTasks.getAccountNo(req, res);
     res.locals.title = "Upload Meter Reading";
-    res.render("upload_image");
+    customerTasks.checkBillThisMonth(account_no,(error,bill)=>{
+      if(bill == "no_bill"){
+        res.render("upload_image",{messageWarning:
+          "There is no bill for this month. Please submit the meter reading for this month",})
+      }
+      else if(bill == "have_bill"){ 
+        res.render("upload_image",{alert:"info",alertTitle:"Info"});
+      }
+    })
+    //res.render("upload_image");
 } else {
     res.redirect("/");
   }
@@ -77,7 +87,16 @@ router.get("/upload_image", authController.isLoggedIn, (req, res) => {
 router.get('/view_bill', authController.isLoggedIn, (req, res) => {
   if (req.user) {
     res.locals.title = "View Bill";
-    res.render("view_bill");
+    customerTasks.viewBill(req,res);
+} else {
+    res.redirect("/");
+  }
+});
+
+router.get('/view_maintenances', authController.isLoggedIn, (req, res) => {
+  if (req.user) {
+    res.locals.title = "View Maintenances";
+    customerTasks.viewMaintenances(req,res);
 } else {
     res.redirect("/");
   }
@@ -87,5 +106,6 @@ router.post("/update_user", customerTasks.updateUser);
 router.post("/make_complain", customerTasks.makeComplain);
 router.post('/change_password', customerTasks.changePW);
 router.post('/upload_image', customerTasks.uploadImage);
+router.post('/confirm_reading', customerTasks.generateBill);
 
 module.exports = router;

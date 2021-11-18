@@ -218,34 +218,38 @@ exports.deleteCustomer = (req, res) => {
 //**********************/
 
 //add pricing
-exports.addPricing = (req,res)=>{
-  let {tariff, b1_30, b31_60, b61_90,b91_105} = req.body;
+exports.addPricing = (req, res) => {
+  let { tariff, b1_30, b31_60, b61_90, b91_105 } = req.body;
   try {
-    db.start.query('INSERT INTO pricing SET ?',
-    [{tariff: tariff,
-      b1_30: b1_30,
-      b31_60: b31_60,
-      b61_90: b61_90,
-      b91_105: b91_105,
-    }
-    ],(error,results)=>{
-      if(!error){
-        return res.render("./admin/add_pricing", {
-          message: "Pricing Added!",
-          title: 'Add Pricing',
-        });
+    db.start.query(
+      "INSERT INTO pricing SET ?",
+      [
+        {
+          tariff: tariff,
+          b1_30: b1_30,
+          b31_60: b31_60,
+          b61_90: b61_90,
+          b91_105: b91_105,
+        },
+      ],
+      (error, results) => {
+        if (!error) {
+          return res.render("./admin/add_pricing", {
+            message: "Pricing Added!",
+            title: "Add Pricing",
+          });
+        } else {
+          console.log(error);
+        }
       }
-      else{
-        console.log(error);
-      }
-    })
+    );
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 //view all pricings in a table
-exports.viewAllPricings = (req,res)=>{
+exports.viewAllPricings = (req, res) => {
   try {
     db.start.query("SELECT * FROM pricing", (error, results) => {
       if (!error) {
@@ -257,27 +261,66 @@ exports.viewAllPricings = (req,res)=>{
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 //edit pricing - Send the editing data to the form
-exports.editPricing = (req,res)=>{
+exports.editPricing = (req, res) => {
   try {
-    db.start.query('SELECT * FROM pricing WHERE tariff = ?',[req.params.id],
-    (error,results)=>{
-      if (!error) {
-        res.render("admin/edit_pricing", { results });
-      } else {
-        console.log(error);
+    db.start.query(
+      "SELECT * FROM pricing WHERE tariff = ?",
+      [req.params.id],
+      (error, results) => {
+        if (!error) {
+          res.render("admin/edit_pricing", { results });
+        } else {
+          console.log(error);
+        }
       }
-    })
-    
+    );
   } catch (error) {
     console.log(error);
   }
-}
+};
 
+//update pricing
+exports.updatePricing = (req, res) => {
+  let { tariff, b1_30, b31_60, b61_90, b91_105 } = req.body;
+  try {
+    db.start.query("UPDATE pricing SET ? WHERE tariff = ?",
+    [{
+          b1_30: b1_30,
+          b31_60: b31_60,
+          b61_90: b61_90,
+          b91_105: b91_105,
+    },
+    tariff
+  ],(error,results)=>{
+    if(!error){
+      try {
+        db.start.query(
+          "SELECT * FROM pricing WHERE tariff = ?",
+          [tariff],
+          (error, results) => {
+            if (!error) {
+              res.render("admin/edit_pricing", { results,
+                message: "Tariff has been updated!", });
+            } else {
+              console.log(error);
+            }
+          }
+        );
+      } catch (error) {
+        
+      }
+    }
+  })
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 //* Area Officer Management */
+//**********************/
 
 //add area office
 exports.addAreaOffice = (req, res) => {
@@ -304,14 +347,14 @@ exports.addAreaOffice = (req, res) => {
   ) {
     return res.status(400).render("admin/add_areaoffice", {
       messageWarning: "Please provide required fields",
-      title:'Add Area Office',
+      title: "Add Area Office",
     });
   }
   //check passwords
   else if (password != conf_password) {
     return res.render("admin/add_areaoffice", {
       messageWarning: "Passwords do not match!",
-      title:'Add Area Office',
+      title: "Add Area Office",
     });
   }
   try {
@@ -323,7 +366,7 @@ exports.addAreaOffice = (req, res) => {
         if (results.length > 0) {
           return res.render("admin/add_areaoffice", {
             messageWarning: "Already Registered!",
-            title:'Add Area Office',
+            title: "Add Area Office",
           });
         } else {
           const hashedPW = await bcrypt.hash(password, 10);
@@ -344,7 +387,7 @@ exports.addAreaOffice = (req, res) => {
               if (!error) {
                 return res.render("admin/add_areaoffice", {
                   message: "Area Office Registered Successfully!",
-                  title:'Add Area Office',
+                  title: "Add Area Office",
                 });
               } else {
                 console.log(error);

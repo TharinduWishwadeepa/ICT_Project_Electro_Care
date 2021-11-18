@@ -3,6 +3,7 @@ const router = express.Router();
 const authController = require('../controllers/admin_auth_control');
 const adminTasks = require('../controllers/admin_tasks');
 
+//gets
 router.get('/', authController.isLoggedIn, (req, res) => {
     if(req.user) {
         res.locals.title = "Welcome Admin";
@@ -69,8 +70,6 @@ router.get('/add_pricing', authController.isLoggedIn,(req,res)=>{
     }
 });
 
-router.post('/add_pricing',adminTasks.addPricing);
-
 router.get('/edit_pricing/:id',authController.isLoggedIn,(req,res)=>{
     if(req.user){
         res.locals.title = "Edit Pricing";
@@ -91,6 +90,9 @@ router.get('/add_areaoffice',authController.isLoggedIn,(req,res)=>{
     }
 });
 
+//posts
 router.post('/add_areaoffice',adminTasks.addAreaOffice);
+router.post('/update_pricing',adminTasks.updatePricing);
+router.post('/add_pricing',adminTasks.addPricing);
 
 module.exports = router;

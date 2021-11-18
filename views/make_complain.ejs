@@ -38,6 +38,20 @@
             </form>
 
         </div>
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <% if (typeof alert != "undefined" && alert) { %>
+            <script>
+                const el = document.createElement('div')
+                el.innerHTML = "<a href='/view_complain'><button class='btn btn-primary'>View Complain</button></a>"
+             swal({
+                title: "<%= alertTitle %>",
+                icon: "success",
+                button: false,
+                closeOnClickOutside: false,
+                content: el,
+                });
+           </script>
+           <% } %>
 
 
         <%- include('./partials/footer.ejs') %>

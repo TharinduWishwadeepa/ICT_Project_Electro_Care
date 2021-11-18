@@ -4,14 +4,19 @@
 
     <body>
         <div class="container col-md-4 mt-3">
-            <h4>Confirm Meter Reading</h4>
-            <h5>Your reading is :  <% if (typeof meterReadingFormatted !="undefined" && meterReadingFormatted) { %>
-                    
+            <h4 class="text-center">Confirm Meter Reading</h4>
+            <h2 class="meter-reading"> <% if (typeof meterReadingFormatted !="undefined" && meterReadingFormatted) { %> 
                         <%= meterReadingFormatted %>
-                    </h5>
+                    </h2>
 
                     <form action="/confirm_reading" method="POST">
                         <input type="hidden" name="meter_reading" value="<%= meterReadingFormatted %>">
+                        <input type="hidden" name="tariff" value="<% if (typeof tariff !="undefined" && tariff) { %><%= tariff %><% } %>">
+                        <input type="hidden" name="current_reading" value="<% if (typeof current_reading !="undefined" && current_reading) { %><%= current_reading %><% } %>">
+                        <input type="hidden" name="url" value="<% if (typeof url !="undefined" && url) { %> <%= url %><% } %>">
+                        <input type="hidden" name="balance" value="<% if (typeof balance !="undefined" && balance) { %> <%= balance %><% } %>">
+                        <input type="hidden" name="account_no" value="<% if (typeof account_no !="undefined" && account_no) { %> <%= account_no %><% } %>">
+                        <input type="hidden" name="customername" value="<% if (typeof customername !="undefined" && customername) { %> <%= customername %><% } %>">
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" id="termsChkbx" onchange="isChecked(this, 'confirm')">
                             <label class="form-check-label" for="termsChkbx">I confirm that the reading is correct</label>
@@ -24,15 +29,32 @@
                     <% } %>
            
         </div>
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <% if (typeof alert != "undefined" && alert) { %>
+            <script>
+             const el = document.createElement('div')
+                el.innerHTML = "<a href='/'><button class='btn btn-success'>Go to Home</button></a>"
+             swal({
+                title: "<%= alertTitle %>",
+                icon: "success",
+                button: false,
+                text:"You have submitted the meter Reading for this month",
+                closeOnClickOutside: false,
+                content: el,
+                });
+           </script>
+           <% } %>
 
 
         <%- include('./partials/footer.ejs') %>
+        
             <script>
                 //check the ckeckbox is checked
                 function isChecked(checkbox, confirm) {
                     document.getElementById(confirm).disabled = !checkbox.checked;
                 }
             </script>
+            
     </body>
 
 </html>
