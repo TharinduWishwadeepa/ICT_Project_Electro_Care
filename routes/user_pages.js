@@ -10,7 +10,7 @@ router.get("/", authController.isLoggedIn, (req, res) => {
     let account_no = customerTasks.getAccountNo(req, res);
     customerTasks.getCustomerData(account_no, (error, results) => {
       if (error) {
-        console.log("eroor");
+        console.log(error);
       } else {
         res.render("index", { results });
       }
@@ -78,7 +78,6 @@ router.get("/upload_image", authController.isLoggedIn, (req, res) => {
         res.render("upload_image",{alert:"info",alertTitle:"Info"});
       }
     })
-    //res.render("upload_image");
 } else {
     res.redirect("/");
   }
@@ -102,6 +101,23 @@ router.get('/view_maintenances', authController.isLoggedIn, (req, res) => {
   }
 });
 
+router.get('/view_complain', authController.isLoggedIn, (req, res) => {
+  if (req.user) {
+    res.locals.title = "View Complain";
+    customerTasks.viewComplain(req,res);
+} else {
+    res.redirect("/");
+  }
+});
+
+router.get('/notifications', authController.isLoggedIn, (req, res) => {
+  if (req.user) {
+    res.locals.title = "Notifications";
+    customerTasks.viewNotifications(req,res);
+} else {
+    res.redirect("/");
+  }
+});
 router.post("/update_user", customerTasks.updateUser);
 router.post("/make_complain", customerTasks.makeComplain);
 router.post('/change_password', customerTasks.changePW);

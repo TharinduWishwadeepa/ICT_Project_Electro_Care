@@ -14,6 +14,7 @@ db.start.connect((error)=>{
     }
 })
 app.set('view engine','ejs');
+app.locals.moment = require('moment');
 
 app.use(fileUpload({
     useTempFiles:true

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('./partials/header.ejs') %>
+
+    <body>
+        <div class="container col-md-4 mt-3">
+            <div class="row mb-3">
+                <div class="col-3"><a href="/" class="back-button-link"><h3><i class="bi bi-arrow-left"></i></h3></a></div>
+                <div class="col-9"><h4>Notifications</h4></div>
+            </div>
+            
+            <div>
+                <% if(typeof notification !='undefined' && notification.length!=0){ var i=1; notification.forEach(function(data){%> 
+                    <div class="row">
+                    <div class="col-1">
+                        <% if(data.type == "Maintenance"){ %>                           
+                        <i class="bi bi-lightning-charge-fill"></i>
+                        <% } %> 
+                    </div>
+                    <div class="col-8">
+                        <p class="small"><%= data.description %> </p>
+                    </div>
+                    <div class="col-3">
+                        <p class="text-end" style="font-size: xx-small;"><%= moment(data.timestamp).fromNow() %></p>
+                    </div>
+                    <hr>
+                    
+                
+                    <% i++; }) %>
+                    <% } else if(typeof Message!="undefined" &&Message) { %>
+                        <p><%= Message %> </p>
+                        <% } %>
+                    </div>
+            </div>
+        </div>
+        <%- include('./partials/footer.ejs') %>
+    </body>
+
+</html>

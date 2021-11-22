@@ -3,10 +3,12 @@
 <%- include('./partials/header.ejs') %>
 
     <body>
-        <div class="container col-md-4 mt-3">
-            <a href="/">Back</a>
-            <h4 class="text-center mb-4">Make a Complain</h4>
-
+        <div class="container col-md-4 mt-4">
+            <div class="row mb-3">
+                <div class="col-1"><a href="/" class="back-button-link"><h3><i class="bi bi-arrow-left"></i></h3></a></div>
+                <div class="col-11 text-center"><h3>Make a Complain</h3></div>
+            </div>
+            
             <form action="/make_complain" method="post">
                 <div class="mb-3">
                     <label class="form-label">Complain Type</label>
@@ -31,12 +33,16 @@
                           <%= messageWarning %>
                         </div>
                         <% } %>
-                <div class="col-6 mx-auto d-grid mb-3">
+                <div class="col-6 mx-auto d-grid mt-4 mb-3">
                     <button type="submit" class="btn btn-primary">Submit Complain</button>
                   </div>
 
             </form>
-
+            <div class="row mb-3">
+                <p>Use this form to make complains about power cuts and other types of complains.
+                    Your complain will recieve to your Electricity Area Office.
+                </p>
+            </div>
         </div>
         <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
         <% if (typeof alert != "undefined" && alert) { %>

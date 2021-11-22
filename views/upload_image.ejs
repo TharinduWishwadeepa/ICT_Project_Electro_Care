@@ -3,10 +3,16 @@
 <%- include('./partials/header.ejs') %>
 
     <body>
+        
         <div class="container col-md-4 mt-3">
-            <a href="/">Back</a>
-            <h3 class="text-center mb-5">Upload Meter Reading</h3>
+            <div class="row mb-3">
+                <div class="col-1"><a href="/" class="back-button-link"><h3><i class="bi bi-arrow-left"></i></h3></a></div>
+                <div class="col-11 text-center"><h3>Upload Meter Reading</h3></div>
+            </div>
+            <div class="card shadow p-3 mb-3" style=" border-radius: 25px; background-color: #FECE2F;">
+                <div class="card-body text-center">
             <form action="/upload_image" method="POST" enctype="multipart/form-data">
+                <img src="imageup.png" class="img-fluid" width="auto">
                 <input type="file" accept="image/*" capture="environment" name="photo" id="file">
                 
                 <div class="col-6 mx-auto d-grid mb-3">
@@ -18,7 +24,8 @@
                     </div>
                     <% } %>
             </form>
-            
+            </div>
+        </div>
         </div>
         <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
         <% if (typeof alert != "undefined" && alert) { %>
@@ -34,7 +41,7 @@
                 content: el,
                 });
            </script>
-           <% } %>
+           <% } %>  
         <%- include('./partials/footer.ejs') %>
     </body>
 

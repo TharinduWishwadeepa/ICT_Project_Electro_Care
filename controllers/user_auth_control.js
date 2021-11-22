@@ -139,7 +139,7 @@ exports.register = (req, res) => {
 };
 
 //is loggedin
-exports.isLoggedIn = async (req, res, next) => {
+exports.isLoggedIn = async (req, res, next) => { 
   if (req.cookies.jwt) {
     try {
       // verify token

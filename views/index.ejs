@@ -3,11 +3,20 @@
 <%- include('./partials/header.ejs') %>
 
     <body>
+        
         <div class="container col-md-4 mt-4">
+            <div id="mySidenav" class="sidenav">
+                <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+                <a href="/upload_image"><i class="bi bi-arrow-up-circle"></i> Submit Reading</a>
+                <a href="#">Services</a>
+                <a href="#">Clients</a>
+                <a href="/user_auth/logout">Logout</a>
+              </div>
             <div class="row mb-3">
-                <div class="col-1"><h3><i class="bi bi-list"></i></h3></div>
-                <div class="col-9 text-center"><h3>Hi, Perera!</h3></div>
-                <div class="col-2 text-start"><h3 style="color: #FECE2F;"><i class="bi bi-bell" ></i></h3></div>
+                <div class="col-1"><span onclick="openNav()"><h3><i class="bi bi-list"></i></h3></span></div>
+                <% if(typeof results !='undefined' && results) { %>
+                <div class="col-9 text-center"><h3>Hi, <%= results[0].name.split(" ")[0] %>  !</h3></div>
+                <div class="col-2 text-start"><a href="/notifications" class="bell-button-link"><h3 style="color: #FECE2F;"><i class="bi bi-bell" ></i></h3></a></div>
             </div>
             
             <div class="card shadow p-3 mb-3" style=" border-radius: 25px;background-color: #FECE2F;">
@@ -21,7 +30,7 @@
             <div class="card shadow p-3 mb-3" style="border-radius: 25px;background-color: #FECE2F;">
                 <div class="card-body text-center">
                     <h5 class="text-center">Total Amount Payable</h5>
-                    <% if(typeof results !='undefined' && results) { %>
+                   
                         <h2 class="pt-3"><span style="font-size:medium;">Rs. </span><%= results[0].balance %>
                         </h2>
                         <% } %>
@@ -31,7 +40,7 @@
                     </div>
                 </div>
               </div>
-              <a href="/user_auth/logout">logout</a>
+            
               <a href="/edit_user">Edit user</a>
               <a href="/make_complain">Make Complain</a>
               <a href="/change_password">Change Password</a><br>
@@ -42,6 +51,15 @@
         </div>
 
         <%- include('./partials/footer.ejs') %>
+        <script>
+            function openNav() {
+            document.getElementById("mySidenav").style.width = "250px";
+            }
+
+            function closeNav() {
+            document.getElementById("mySidenav").style.width = "0";
+            }
+        </script>
     </body>
 
 </html>

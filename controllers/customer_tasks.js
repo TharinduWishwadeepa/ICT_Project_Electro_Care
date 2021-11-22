@@ -25,7 +25,7 @@ exports.getAccountNo = (req, res) => {
 exports.getCustomerData = (account_no, callback) => {
   try {
     db.start.query(
-      "SELECT name, area_id, balance, tariff, current_reading FROM customer WHERE account_no = ?",
+      "SELECT name, area_id, balance, tariff, current_reading,username FROM customer WHERE account_no = ?",
       [account_no],
       (error, results) => {
         if (!error) {
@@ -117,6 +117,58 @@ exports.updateUser = (req, res) => {
   }
 };
 
+//create a notification
+exports.makeNotification = (notification, callback) => {
+  try {
+    db.start.query(
+      "INSERT INTO notification SET ?",
+      [
+        {
+          type: notification.type,
+          description: notification.description,
+          notification_to: notification.notification_to,
+          notification_from: notification.notification_from,
+          link: notification.link,
+        },
+      ],
+      (error, results) => {
+        if (!error) {
+          return callback(null, "success");
+        } else {
+          return callback(error, null);
+        }
+      }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+exports.viewNotifications = (req, res) => {
+  let account_no = this.getAccountNo(req, res);
+  try {
+    db.start.query(
+      "SELECT * FROM notification WHERE notification_to = ? ORDER BY timestamp DESC",
+      [account_no],
+      (error, results) => {
+        if (results.length == 0) {
+          console.log("no notifications");
+          return res.render("notifications", {
+            Message: "No notifications to show.",
+          });
+        } else if (results.length >= 1) {
+          console.log(results);
+          return res.render("notifications", { notification: results });
+        } else if (error) {
+          console.log("error", error);
+        }
+      }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 //make complain
 exports.makeComplain = (req, res) => {
   let { type, description } = req.body;
@@ -143,11 +195,29 @@ exports.makeComplain = (req, res) => {
         ],
         (error, results) => {
           if (!error) {
-            return res.render("make_complain", {
-              title: "Make Complain",
-              alert:"alert",
-              alertTitle:"Complain Added Successfully!"
-            });
+            try {
+              //notification
+              let notification = {
+                type: "Complain",
+                description: `${account_no} has made a complain`,
+                notification_to: area_id,
+                notification_from: account_no,
+                link: results.insertId,
+              };
+              this.makeNotification(notification, (error, results) => {
+                if (results == "success") {
+                  return res.render("make_complain", {
+                    title: "Make Complain",
+                    alert: "alert",
+                    alertTitle: "Complain Added Successfully!",
+                  });
+                } else {
+                  console.log(error);
+                }
+              });
+            } catch (error) {
+              console.log(error);
+            }
           } else {
             console.log(error);
           }
@@ -164,12 +234,12 @@ exports.viewComplain = (req, res) => {
   try {
     let account_no = this.getAccountNo(req, res);
     db.start.query(
-      "SELECT * FROM complain WHERE status = pending AND account_no = ? ORDER BY datetime DESC ",
+      "SELECT * FROM complain WHERE status = 'pending' AND account_no = ? ORDER BY datetime DESC LIMIT 1 ",
       [account_no],
       (error, results) => {
         if (!error) {
           console.log(results);
-          //render
+          return res.render("view_complain", { results });
         } else {
           console.log(error);
         }
@@ -187,7 +257,7 @@ exports.getPricing = (tariff, callback) => {
       "SELECT * FROM pricing WHERE tariff = ? ",
       [tariff.trim()],
       (error, results) => {
-        if (!error) {  
+        if (!error) {
           return callback(null, results);
         } else {
           return callback(error, null);
@@ -230,8 +300,8 @@ exports.changePW = (req, res) => {
           } else {
             let hashedPW = await bcrypt.hash(new_pw, 10);
             db.start.query(
-              "UPDATE customer SET password =?",
-              [hashedPW],
+              "UPDATE customer SET password =? WHERE account_no = ?",
+              [hashedPW, account_no],
               (error, results) => {
                 if (!error) {
                   return res.status(200).render("change_password", {
@@ -360,25 +430,26 @@ exports.uploadImage = (req, res, next) => {
 };
 
 //check if there is a bill for current month
-exports.checkBillThisMonth = (account_no,callback)=>{
+exports.checkBillThisMonth = (account_no, callback) => {
   try {
-    db.start.query("SELECT * FROM bill WHERE account_no = ? AND ( MONTH(date_of_bill) = MONTH(CURRENT_DATE()) AND YEAR(date_of_bill) = YEAR(CURRENT_DATE()) )",
-    [account_no],(error,results)=>{
-      let bill;
-      if (results.length == 0) {
-        // if there is no bill
-        bill = "no_bill";
-        return callback(null, bill );
+    db.start.query(
+      "SELECT * FROM bill WHERE account_no = ? AND ( MONTH(date_of_bill) = MONTH(CURRENT_DATE()) AND YEAR(date_of_bill) = YEAR(CURRENT_DATE()) )",
+      [account_no],
+      (error, results) => {
+        let bill;
+        if (results.length == 0) {
+          // if there is no bill
+          bill = "no_bill";
+          return callback(null, bill);
+        } else if (results.length == 1) {
+          bill = "have_bill";
+          return callback(null, bill);
+        }
       }
-      else if(results.length == 1){
-        bill = "have_bill";
-        return callback(null, bill);
-      }
-    })
-  } catch (error) {
-    
-  }
-}
+    );
+  } catch (error) {}
+};
+
 //confirm and generate bill
 exports.generateBill = (req, res) => {
   let {
@@ -457,7 +528,7 @@ exports.generateBill = (req, res) => {
                     if (!error) {
                       return res.render("confirm_reading", {
                         alert: "alert",
-                         alertTitle: "Success!",    
+                        alertTitle: "Success!",
                       });
                     } else {
                       console.log(error);
@@ -483,13 +554,12 @@ exports.generateBill = (req, res) => {
 exports.viewBill = (req, res) => {
   try {
     let account_no = this.getAccountNo(req, res);
-    
+
     //select bill of current month
     db.start.query(
       "SELECT * FROM bill WHERE account_no = ? AND ( MONTH(date_of_bill) = MONTH(CURRENT_DATE()) AND YEAR(date_of_bill) = YEAR(CURRENT_DATE()) )",
       [account_no],
       (error, bill_results) => {
-        
         if (bill_results.length == 0) {
           // if there is no bill
           res.render("view_bill", {
@@ -517,7 +587,6 @@ exports.viewBill = (req, res) => {
                       bill_results,
                       title: "View Bill",
                     });
-                    
                   }
                 }
               );
@@ -534,28 +603,28 @@ exports.viewBill = (req, res) => {
 };
 
 //view maintenances
-exports.viewMaintenances = (req,res)=>{
+exports.viewMaintenances = (req, res) => {
   try {
-    let account_no = this.getAccountNo(req,res);
-    this.getCustomerData(account_no,(error,results)=>{
-      if(!error){
+    let account_no = this.getAccountNo(req, res);
+    this.getCustomerData(account_no, (error, results) => {
+      if (!error) {
         let area_id = results[0].area_id;
-        db.start.query("SELECT * FROM maintenance WHERE area_id = ? AND (date >= DATE_ADD(NOW(), INTERVAL -2 MONTH))",
-    [area_id],(error,results)=>{
-      if(!error){
-        return res.render('view_maintenances',{results});
-      }
-      else{
+        db.start.query(
+          "SELECT * FROM maintenance WHERE area_id = ? AND (date >= DATE_ADD(NOW(), INTERVAL -2 MONTH))",
+          [area_id],
+          (error, results) => {
+            if (!error) {
+              return res.render("view_maintenances", { results });
+            } else {
+              console.log(error);
+            }
+          }
+        );
+      } else {
         console.log(error);
       }
-    })
-      }
-      else{
-        console.log(error);
-      }
-    })
-    
+    });
   } catch (error) {
     console.log(error);
   }
-}
+};
