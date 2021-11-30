@@ -4,7 +4,9 @@
 
     <body>
         <div class="container col-md-4 mt-3">
-            
+            <% if(typeof results !='undefined' && results.length!=0){%>
+                <p style="white-space: pre-wrap"><%= results[0].description %></p> 
+                <% } %> 
         </div>
         <%- include('./partials/footer.ejs') %>
     </body>

@@ -2,9 +2,29 @@
 <html lang="en">
 <%- include('./partials/header.ejs') %>
 
-    <body>
+    <body style="background-color: #F3F3F3;">
         <div class="container col-md-4 mt-3">
+            <div class="row mb-3">
+                <div class="col-2"><a href="/" class="back-button-link"><h3><i class="bi bi-arrow-left"></i></h3></a></div>
+                <div class="col-9 text-center ps-0"><h4>Maintenances</h4></div>
+            </div>
             
+            <% if(typeof maintenances !='undefined' && maintenances.length!=0){ var i=1; maintenances.forEach(function(data){%>
+                <div class="card shadow p-3 pb-2 mb-3" style="border-radius: 10px;">
+                    <div class="row">
+                    <div class="col-2">
+                        <span class="fa-stack" style="vertical-align: top;">
+                            <i class="fas fa-circle fa-stack-2x" style="color: #FECE2F;"></i>
+                            <i class="fas fa-wrench fa-stack-1x fa-inverse"></i>
+                          </span>
+                    </div>
+                    <div class="col-10 ps-0">
+                        <span><b>Maintenance on <%= moment(data.timestamp).format("YYYY-MM-DD") %> </b></span> 
+                        <p class="small" style="white-space: pre-wrap;"><%= data.description %> </p>
+                    </div>
+                    </div>
+            </div>
+                <% i++; }) }%>  
         </div>
         <%- include('./partials/footer.ejs') %>
     </body>

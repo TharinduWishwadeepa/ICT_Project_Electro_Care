@@ -219,7 +219,7 @@ exports.deleteCustomer = (req, res) => {
 
 //add pricing
 exports.addPricing = (req, res) => {
-  let { tariff, b1_30, b31_60, b61_90, b91_105 } = req.body;
+  let { tariff, b1_30, b31_60, b61_90, b91_105,fixed_price } = req.body;
   try {
     db.start.query(
       "INSERT INTO pricing SET ?",
@@ -230,6 +230,7 @@ exports.addPricing = (req, res) => {
           b31_60: b31_60,
           b61_90: b61_90,
           b91_105: b91_105,
+          fixed_price: fixed_price
         },
       ],
       (error, results) => {
@@ -284,7 +285,7 @@ exports.editPricing = (req, res) => {
 
 //update pricing
 exports.updatePricing = (req, res) => {
-  let { tariff, b1_30, b31_60, b61_90, b91_105 } = req.body;
+  let { tariff, b1_30, b31_60, b61_90, b91_105,fixed_price } = req.body;
   try {
     db.start.query("UPDATE pricing SET ? WHERE tariff = ?",
     [{
@@ -292,6 +293,7 @@ exports.updatePricing = (req, res) => {
           b31_60: b31_60,
           b61_90: b61_90,
           b91_105: b91_105,
+          fixed_price: fixed_price
     },
     tariff
   ],(error,results)=>{
@@ -551,6 +553,14 @@ exports.resetPWAreaOffice = (req, res) => {
 
 //**Meter Reader Management */
 
+//add meter reader
+exports.addMeterReader = (req,res)=>{
+  try {
+    
+  } catch (error) {
+    
+  }
+}
 //view all Meter Readers
 exports.viewAllMeterReaders = (req, res) => {
   try {

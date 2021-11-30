@@ -2,36 +2,52 @@
 <html lang="en">
 <%- include('./partials/header.ejs') %>
 
-    <body>
-        <div class="container col-md-4 mt-3">
+    <body style="background-color: #F3F3F3;">
+        <div class="container col-md-4 mt-4">
             <div class="row mb-3">
-                <div class="col-3"><a href="/" class="back-button-link"><h3><i class="bi bi-arrow-left"></i></h3></a></div>
-                <div class="col-9"><h4>Notifications</h4></div>
+                <div class="col-2"><a href="/" class="back-button-link"><h3><i class="bi bi-arrow-left"></i></h3></a></div>
+                <div class="col-9 text-center ps-0"><h4>Notifications</h4></div>
             </div>
-            
-            <div>
-                <% if(typeof notification !='undefined' && notification.length!=0){ var i=1; notification.forEach(function(data){%> 
+
+            <% if(typeof notification !='undefined' && notification.length!=0){ var i=1; notification.forEach(function(data){%> 
+            <div class="card shadow p-3 pb-2 mb-3" style="border-radius: 10px;">
                     <div class="row">
-                    <div class="col-1">
-                        <% if(data.type == "Maintenance"){ %>                           
-                        <i class="bi bi-lightning-charge-fill"></i>
+                    <div class="col-2">
+                        <% if(data.type == "Maintenance"){ %>    
+                            <span class="fa-stack" style="vertical-align: top;">
+                                <i class="fas fa-circle fa-stack-2x" style="color: #50D3EE;"></i>
+                                <i class="fas fa-bolt fa-stack-1x fa-inverse"></i>
+                              </span>                     
+                        <% } %> 
+                        <% if(data.type == "Payment") {%>
+                            <span class="fa-stack" style="vertical-align: top;">
+                                <i class="fas fa-circle fa-stack-2x" style="color: #EE5055;"></i>
+                                <i class="fas fa-file-invoice fa-stack-1x fa-inverse"></i>
+                              </span> 
+                        <% } %> 
+                        <% if(data.type == "Submit Meter Reading") {%>
+                            <span class="fa-stack" style="vertical-align: top;">
+                                <i class="fas fa-circle fa-stack-2x" style="color: #FECE2F;"></i>
+                                <i class="fas fa-camera fa-stack-1x fa-inverse"></i>
+                              </span>
+                            
                         <% } %> 
                     </div>
-                    <div class="col-8">
+                    <div class="col-10 ps-0">
+                        <a href="<%= data.link %>" style="text-decoration: none; color: black;">
+                       <span><b><%= data.title %> </b></span> 
                         <p class="small"><%= data.description %> </p>
+                        <p style="font-size:x-small;"><i class="bi bi-clock"></i> <%= moment(data.timestamp).fromNow() %></p>
+                    </a>   
                     </div>
-                    <div class="col-3">
-                        <p class="text-end" style="font-size: xx-small;"><%= moment(data.timestamp).fromNow() %></p>
-                    </div>
-                    <hr>
                     
-                
-                    <% i++; }) %>
-                    <% } else if(typeof Message!="undefined" &&Message) { %>
-                        <p><%= Message %> </p>
-                        <% } %>
+                    
                     </div>
             </div>
+            <% i++; }) }%>
+            <% if(typeof Message!="undefined" &&Message) { %>
+                <p><%= Message %> </p>
+                <% } %>
         </div>
         <%- include('./partials/footer.ejs') %>
     </body>

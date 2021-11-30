@@ -1,6 +1,7 @@
 const db = require("../model/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const notify = require('./notifications');
 var cloudinary = require("cloudinary").v2;
 
 //cloudinary configuration
@@ -117,39 +118,12 @@ exports.updateUser = (req, res) => {
   }
 };
 
-//create a notification
-exports.makeNotification = (notification, callback) => {
-  try {
-    db.start.query(
-      "INSERT INTO notification SET ?",
-      [
-        {
-          type: notification.type,
-          description: notification.description,
-          notification_to: notification.notification_to,
-          notification_from: notification.notification_from,
-          link: notification.link,
-        },
-      ],
-      (error, results) => {
-        if (!error) {
-          return callback(null, "success");
-        } else {
-          return callback(error, null);
-        }
-      }
-    );
-  } catch (error) {
-    console.log(error);
-  }
-};
-
 exports.viewNotifications = (req, res) => {
   let account_no = this.getAccountNo(req, res);
   try {
     db.start.query(
-      "SELECT * FROM notification WHERE notification_to = ? ORDER BY timestamp DESC",
-      [account_no],
+      "SELECT * FROM notification WHERE notification_to = ? OR notification_to = 'Everyone' ORDER BY timestamp DESC",
+      [account_no], 
       (error, results) => {
         if (results.length == 0) {
           console.log("no notifications");
@@ -157,7 +131,6 @@ exports.viewNotifications = (req, res) => {
             Message: "No notifications to show.",
           });
         } else if (results.length >= 1) {
-          console.log(results);
           return res.render("notifications", { notification: results });
         } else if (error) {
           console.log("error", error);
@@ -199,12 +172,13 @@ exports.makeComplain = (req, res) => {
               //notification
               let notification = {
                 type: "Complain",
+                title: "Customer Complain",
                 description: `${account_no} has made a complain`,
                 notification_to: area_id,
                 notification_from: account_no,
                 link: results.insertId,
               };
-              this.makeNotification(notification, (error, results) => {
+              notify.makeNotification(notification, (error, results) => {
                 if (results == "success") {
                   return res.render("make_complain", {
                     title: "Make Complain",
@@ -367,11 +341,16 @@ exports.uploadImage = (req, res, next) => {
         } else {
           let resultObj = JSON.parse(body); //get the JSON Result of OCR
 
-          if (resultObj.result[0].prediction.length === 0) {
+          if (!resultObj.result) {
             // if there is no result
             res.render("upload_image", {
-              messageWarning: "Cannot Get Reading",
+              alert:"error",
+              alertTitle:"Ooops !",
               title: "Upload Meter Reading",
+              text:"Cannot get the Reading. Please Try Again !",
+              link:"/upload_image",
+              buttonType:"btn-secondary",
+              buttonTxt:"Try Again"
             });
           } else {
             // if there is a result
@@ -392,14 +371,26 @@ exports.uploadImage = (req, res, next) => {
             //if the reading length is less than 5
             if (meterReading.length < 5) {
               res.render("upload_image", {
-                messageWarning: "Invalid Reading",
+                alert:"error",
+                alertTitle:"Ooops !",
+                title: "Upload Meter Reading",
+                text:"Invalid Meter Reading. Please Try Again !",
+                link:"/upload_image",
+                buttonType:"btn-secondary",
+                buttonTxt:"Try Again",
                 title: "Upload Meter Reading",
               });
             }
             //if meter reading is less than current_reading
             else if (meterReadingFormatted <= current_reading) {
               res.render("upload_image", {
-                messageWarning: "Invalid Reading",
+                alert:"error",
+                alertTitle:"Ooops !",
+                title: "Upload Meter Reading",
+                text:"Invalid Meter Reading. Please Try Again !",
+                link:"/upload_image",
+                buttonType:"btn-secondary",
+                buttonTxt:"Try Again",
                 title: "Upload Meter Reading",
               });
             } else {
@@ -462,7 +453,6 @@ exports.generateBill = (req, res) => {
     customername,
   } = req.body;
   account_no = account_no.trim();
-  console.log(req.body);
   try {
     //get pricing
     this.getPricing(tariff, (error, results) => {
@@ -475,6 +465,7 @@ exports.generateBill = (req, res) => {
           let b31_60 = results[0].b31_60;
           let b61_90 = results[0].b61_90;
           let b91_105 = results[0].b91_105;
+          let fixed_price = results[0].fixed_price;
 
           let no_of_units = meter_reading - current_reading;
           let total;
@@ -491,8 +482,7 @@ exports.generateBill = (req, res) => {
             total =
               b1_30 * 30 + b31_60 * 30 + b61_90 * 30 + b91_105 * remainder;
           }
-          payableAmount = total + parseFloat(balance);
-          console.log("payable ", payableAmount);
+          payableAmount = total + parseFloat(balance) + parseFloat(fixed_price);
           var today = new Date();
           var dateToday =
             today.getFullYear() +
@@ -509,9 +499,10 @@ exports.generateBill = (req, res) => {
                 account_no: account_no,
                 date_of_bill: dateToday,
                 reading: meter_reading,
+                no_of_units: no_of_units,
                 total: total,
                 image: url,
-                markedby: account_no,
+                markedby: "User",
               },
             ],
             (error, results) => {
@@ -562,10 +553,7 @@ exports.viewBill = (req, res) => {
       (error, bill_results) => {
         if (bill_results.length == 0) {
           // if there is no bill
-          res.render("view_bill", {
-            messageWarning:
-              "There is no bill for this month. Please submit the meter reading for this month",
-          });
+          res.render("view_bill");
         } else if (bill_results) {
           // if there is a bill
           total = bill_results[0].total;
@@ -614,7 +602,7 @@ exports.viewMaintenances = (req, res) => {
           [area_id],
           (error, results) => {
             if (!error) {
-              return res.render("view_maintenances", { results });
+              return res.render("view_maintenances", { maintenances: results });
             } else {
               console.log(error);
             }
@@ -628,3 +616,21 @@ exports.viewMaintenances = (req, res) => {
     console.log(error);
   }
 };
+
+//get usage
+exports.getUsage = (account_no,callback)=>{
+  try {
+    db.start.query('SELECT no_of_units, date_of_bill FROM bill WHERE account_no = ? ORDER BY date_of_bill DESC LIMIT 8',
+    [account_no],(error,usage)=>{
+      if(!error){
+        return callback(null, usage);
+      }
+      else{
+        return callback(error, null);
+      }
+    })
+  } catch (error) {
+    console.log(error);
+  }
+
+}

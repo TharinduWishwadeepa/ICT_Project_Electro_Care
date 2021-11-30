@@ -12,7 +12,32 @@ router.get("/", authController.isLoggedIn, (req, res) => {
       if (error) {
         console.log(error);
       } else {
-        res.render("index", { results });
+        //generate chart
+        customerTasks.getUsage(account_no, (error, usage)=>{
+          let no_of_units = [];
+          let date_of_bill = [];
+          if(!error || usage.length != 0){
+            //push to arrays
+            for(var i=0; i < usage.length; i++){
+              no_of_units.push(usage[i].no_of_units); 
+              let full_date = usage[i].date_of_bill;
+              let month = full_date.toLocaleString('default', { month: 'short' });
+              date_of_bill.push(month);
+            }
+            //reverse array
+            no_of_units = no_of_units.reverse();
+            date_of_bill = date_of_bill.reverse();
+
+            //render
+            res.render("index", { results, no_of_units, date_of_bill });
+          }
+          else if(!error || usage.length == 0){
+            res.render("index", { results, no_of_units, date_of_bill });
+          }
+          else{
+            console.log(error);
+          }
+        })       
       }
     });
   } else {
@@ -71,11 +96,16 @@ router.get("/upload_image", authController.isLoggedIn, (req, res) => {
     res.locals.title = "Upload Meter Reading";
     customerTasks.checkBillThisMonth(account_no,(error,bill)=>{
       if(bill == "no_bill"){
-        res.render("upload_image",{messageWarning:
-          "There is no bill for this month. Please submit the meter reading for this month",})
+        res.render("upload_image")
       }
       else if(bill == "have_bill"){ 
-        res.render("upload_image",{alert:"info",alertTitle:"Info"});
+        res.render("upload_image",{alert:"info",
+        alertTitle:"Info",
+        text:"You have submitted the meter Reading for this month",
+        link:"/",
+        buttonType:"btn-success",
+        buttonTxt:"Go To Home Page"
+      });
       }
     })
 } else {
@@ -118,6 +148,7 @@ router.get('/notifications', authController.isLoggedIn, (req, res) => {
     res.redirect("/");
   }
 });
+
 router.post("/update_user", customerTasks.updateUser);
 router.post("/make_complain", customerTasks.makeComplain);
 router.post('/change_password', customerTasks.changePW);

@@ -3,12 +3,18 @@
 <%- include('./partials/header.ejs') %>
 
     <body>
-        <div class="container col-md-4 mt-3">
-            <h4 class="text-center">Confirm Meter Reading</h4>
-            <h2 class="meter-reading"> <% if (typeof meterReadingFormatted !="undefined" && meterReadingFormatted) { %> 
-                        <%= meterReadingFormatted %>
-                    </h2>
-
+        <div class="container col-md-4 mt-4">
+            <div class="row mb-3">
+                <div class="col-1"><a href="/upload_image" class="back-button-link"><h3><i class="bi bi-arrow-left"></i></h3></a></div>
+                <div class="col-10 text-center"><h3 class="text-center">Confirm Meter Reading</h3></div>    
+            </div>
+            
+            <div class="card shadow p-3 mb-3 mt-5" style=" border-radius: 25px;background-color: #FECE2F;">
+                <h6 class="text-center large" >Your Meter Reading is</h6>
+            <h1 class="meter-reading text-center">
+                <% if (typeof meterReadingFormatted !="undefined" && meterReadingFormatted) { %>
+                        <%= meterReadingFormatted %></h1>
+                    <div class="mt-4">
                     <form action="/confirm_reading" method="POST">
                         <input type="hidden" name="meter_reading" value="<%= meterReadingFormatted %>">
                         <input type="hidden" name="tariff" value="<% if (typeof tariff !="undefined" && tariff) { %><%= tariff %><% } %>">
@@ -17,17 +23,17 @@
                         <input type="hidden" name="balance" value="<% if (typeof balance !="undefined" && balance) { %> <%= balance %><% } %>">
                         <input type="hidden" name="account_no" value="<% if (typeof account_no !="undefined" && account_no) { %> <%= account_no %><% } %>">
                         <input type="hidden" name="customername" value="<% if (typeof customername !="undefined" && customername) { %> <%= customername %><% } %>">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="termsChkbx" onchange="isChecked(this, 'confirm')">
-                            <label class="form-check-label" for="termsChkbx">I confirm that the reading is correct</label>
-                          </div>
+                        <% } %>
+                            <h6 class="text-center" >I confirm that the reading is correct</h6>
                         
-                        <div class="col-6 mx-auto d-grid mb-3">
-                            <button type="submit" class="btn btn-primary" id="confirm" disabled>Confirm</button>
+                        <div class="col-6 mx-auto d-grid gap-2 mb-3">
+                            <button type="submit" class="btn btn-secondary rounded-pill shadow">Confirm</button>
+                            <a type="button" class="btn btn-light rounded-pill shadow" href="/upload_image">Try Again</a>
                         </div>
                     </form>
-                    <% } %>
-           
+                </div>
+                    
+                </div>
         </div>
         <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
         <% if (typeof alert != "undefined" && alert) { %>
@@ -44,17 +50,7 @@
                 });
            </script>
            <% } %>
-
-
-        <%- include('./partials/footer.ejs') %>
-        
-            <script>
-                //check the ckeckbox is checked
-                function isChecked(checkbox, confirm) {
-                    document.getElementById(confirm).disabled = !checkbox.checked;
-                }
-            </script>
-            
+        <%- include('./partials/footer.ejs') %>             
     </body>
 
 </html>

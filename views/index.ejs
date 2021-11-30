@@ -4,62 +4,104 @@
 
     <body>
         
-        <div class="container col-md-4 mt-4">
+        <div class="container col-md-4 mt-3">
+
             <div id="mySidenav" class="sidenav">
                 <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+                <a href="/"><i class="bi bi-house-door-fill"></i> Home</a>
                 <a href="/upload_image"><i class="bi bi-arrow-up-circle"></i> Submit Reading</a>
-                <a href="#">Services</a>
-                <a href="#">Clients</a>
-                <a href="/user_auth/logout">Logout</a>
+                <a href="#"><i class="fas fa-history"></i> Bill History</a>
+                <a href="/make_complain"><i class="fas fa-exclamation-circle"></i> Complaints</a>
+                <a href="/view_maintenances"><i class="fas fa-calendar-times"></i> Maintanance Calender</a>
+                <hr>
+                <a href="/notifications"><i class="bi bi-bell-fill"></i> Notifications</a>
+                <a href="#"><i class="fas fa-cog"></i> Settings</a>
+                <hr>
+                <a href="/user_auth/logout"><i class="bi bi-power"></i> Logout</a>
               </div>
+
             <div class="row mb-3">
                 <div class="col-1"><span onclick="openNav()"><h3><i class="bi bi-list"></i></h3></span></div>
                 <% if(typeof results !='undefined' && results) { %>
                 <div class="col-9 text-center"><h3>Hi, <%= results[0].name.split(" ")[0] %>  !</h3></div>
-                <div class="col-2 text-start"><a href="/notifications" class="bell-button-link"><h3 style="color: #FECE2F;"><i class="bi bi-bell" ></i></h3></a></div>
+                <div class="col-2 text-end"><a href="/notifications" class="bell-button-link"><h3 style="color: #FECE2F;"><i class="bi bi-bell" ></i></h3></a></div>
             </div>
             
             <div class="card shadow p-3 mb-3" style=" border-radius: 25px;background-color: #FECE2F;">
                 <div class="card-body text-center">
                     <h5 class="text-center">Submit Your Meter Reading</h5>
-                    <div class="pt-3">
-                    <a href="/upload_image" type="button" class="btn btn-secondary rounded-pill">Submit Reading</a>
+                    <div class="pt-2">
+                    <a href="/upload_image" type="button" class="btn btn-secondary rounded-pill"><span class="ms-3 me-3">Submit Reading</span></a>
                 </div>       
                 </div>
               </div>
+
             <div class="card shadow p-3 mb-3" style="border-radius: 25px;background-color: #FECE2F;">
                 <div class="card-body text-center">
                     <h5 class="text-center">Total Amount Payable</h5>
                    
-                        <h2 class="pt-3"><span style="font-size:medium;">Rs. </span><%= results[0].balance %>
-                        </h2>
+                        <h1 class="pt-3"><span style="font-size:medium;">Rs. </span><%= results[0].balance %>
+                        </h1>
                         <% } %>
-                        <div class="pt-3">
-                        <a href="" type="button" class="btn btn-secondary rounded-pill" >Pay Now</a>
-                        <a href="" type="button" class="btn btn-secondary rounded-pill">View Bills</a>
+                        
+                        <div class="pt-3">  
+                            <a href="" type="button" class="btn btn-secondary rounded-pill" ><span class="ms-3 me-3">Pay Now</span></a>
+                            <a href="" type="button" class="btn btn-secondary rounded-pill"><span class="ms-3 me-3">View Bills</span></a>
                     </div>
+                    
                 </div>
               </div>
-            
-              <a href="/edit_user">Edit user</a>
-              <a href="/make_complain">Make Complain</a>
-              <a href="/change_password">Change Password</a><br>
               
-              <a href="/view_bill">View Bill</a>
-              <a href="/view_maintenances">View Bill</a>
-                
+              <div class="card shadow p-3 mb-3" style="border-radius: 25px;background-color: #FECE2F;">
+                <h5 class="text-center">My Usage</h5>
+                <canvas id="myChart" style="margin: 1 auto;"></canvas>
+              </div>     
         </div>
 
         <%- include('./partials/footer.ejs') %>
+        <% if(typeof no_of_units !="undefined" && no_of_units && typeof date_of_bill !="undefined" && date_of_bill){ %> 
         <script>
-            function openNav() {
-            document.getElementById("mySidenav").style.width = "250px";
-            }
-
-            function closeNav() {
-            document.getElementById("mySidenav").style.width = "0";
-            }
+            Chart.defaults.color = "black";
+            Chart.defaults.borderColor = "white";
+            const ctx = document.getElementById('myChart'); 
+            let units = JSON.parse('<%- JSON.stringify(no_of_units) %>');
+            let months = JSON.parse('<%- JSON.stringify(date_of_bill) %>');
+            const myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [{ 
+                        data: units,
+                        backgroundColor: "white",                       
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    plugins:{
+                        legend: {
+                        display: false
+                    },
+                    title: {
+                        display: false,
+                        },
+                    },                    
+                    scales: {
+                        y: {
+                            beginAtZero: true, 
+                            grid:{
+                                color:"white"
+                            }     
+                        },
+                        x:{    
+                            grid:{
+                                display:false,
+                            },
+                        }
+                    }
+                }
+            });           
         </script>
+        <% } %> 
     </body>
 
 </html>

@@ -7,7 +7,7 @@
         <div class="container col-md-4 mt-3">
             <div class="row mb-3">
                 <div class="col-1"><a href="/" class="back-button-link"><h3><i class="bi bi-arrow-left"></i></h3></a></div>
-                <div class="col-11 text-center"><h3>Upload Meter Reading</h3></div>
+                <div class="col-10 text-center"><h3>Upload Meter Reading</h3></div>
             </div>
             <div class="card shadow p-3 mb-3" style=" border-radius: 25px; background-color: #FECE2F;">
                 <div class="card-body text-center">
@@ -15,28 +15,25 @@
                 <img src="imageup.png" class="img-fluid" width="auto">
                 <input type="file" accept="image/*" capture="environment" name="photo" id="file">
                 
-                <div class="col-6 mx-auto d-grid mb-3">
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                  </div>
-                  <% if (typeof messageWarning !="undefined" && messageWarning) { %>
-                    <div class="alert alert-danger" role="alert">
-                      <%= messageWarning %>
-                    </div>
-                    <% } %>
+                <div>
+                    <button type="submit" class="btn btn-secondary rounded-pill"><span class="ms-3 me-3">Submit</span></button>
+                  </div> 
             </form>
             </div>
         </div>
         </div>
-        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>      
+        
         <% if (typeof alert != "undefined" && alert) { %>
             <script>
              const el = document.createElement('div')
-                el.innerHTML = "<a href='/'><button class='btn btn-success'>Go to Home Page</button></a>"
+                el.innerHTML = "<a href='<%= link %>'><button class='btn <%= buttonType %> rounded-pill shadow'><span class='ms-3 me-3'><%= buttonTxt %></span></button></a>"
              swal({
                 title: "<%= alertTitle %>",
-                icon: "info",
+                icon: "<%= alert %>",
                 button: false,
-                text:"You have submitted the meter Reading for this month",
+                text:"<%= text%>",
                 closeOnClickOutside: false,
                 content: el,
                 });

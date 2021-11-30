@@ -21,7 +21,7 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Note</label>
-                    <textarea class="form-control" style="height: 150px" name="description"></textarea>
+                    <textarea class="form-control" style="height: 150px" name="description" id="description"></textarea>
                 </div>
                 <% if (typeof message !="undefined" && message) { %>
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -34,7 +34,7 @@
                         </div>
                         <% } %>
                 <div class="col-6 mx-auto d-grid mt-4 mb-3">
-                    <button type="submit" class="btn btn-primary">Submit Complain</button>
+                    <button type="submit" class="btn btn-secondary">Submit Complain</button>
                   </div>
 
             </form>
@@ -48,7 +48,7 @@
         <% if (typeof alert != "undefined" && alert) { %>
             <script>
                 const el = document.createElement('div')
-                el.innerHTML = "<a href='/view_complain'><button class='btn btn-primary'>View Complain</button></a>"
+                el.innerHTML = "<a href='/view_complain'><button class='btn btn-secondary'>View Complain</button></a>"
              swal({
                 title: "<%= alertTitle %>",
                 icon: "success",
@@ -58,7 +58,7 @@
                 });
            </script>
            <% } %>
-
+           
 
         <%- include('./partials/footer.ejs') %>
     </body>

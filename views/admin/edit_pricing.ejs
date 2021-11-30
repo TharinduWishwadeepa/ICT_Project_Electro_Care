@@ -12,20 +12,24 @@
                 <label for="floatingInput">Tariff</label>
               </div>
               <div class="mb-3 form-floating">
-                <input type="text" class="form-control" placeholder="1 - 30" name="b1_30" value="<%= results[0].b1_30 %>">
+                <input type="number" step="0.01" class="form-control" placeholder="1 - 30" name="b1_30" value="<%= results[0].b1_30 %>">
                 <label for="floatingInput">1 - 30</label>
               </div>
               <div class="mb-3 form-floating">
-                <input type="text" class="form-control" placeholder="31 - 60" name="b31_60" value="<%= results[0].b31_60 %>">
+                <input type="number" step="0.01" class="form-control" placeholder="31 - 60" name="b31_60" value="<%= results[0].b31_60 %>">
                 <label for="floatingInput">31 - 60</label>
               </div>
               <div class="mb-3 form-floating">
-                <input type="text" class="form-control" placeholder="61 - 90" name="b61_90" value="<%= results[0].b61_90 %>">
+                <input type="number" step="0.01" class="form-control" placeholder="61 - 90" name="b61_90" value="<%= results[0].b61_90 %>">
                 <label for="floatingInput">61 - 90</label>
               </div>
               <div class="mb-3 form-floating">
-                <input type="text" class="form-control" placeholder="91- 105" name="b91_105" value="<%= results[0].b91_105 %>">
+                <input type="number" step="0.01" class="form-control" placeholder="91- 105" name="b91_105" value="<%= results[0].b91_105 %>">
                 <label for="floatingInput">91- 105</label>
+              </div>
+              <div class="mb-3 form-floating">
+                <input type="number" step="0.01" class="form-control" placeholder="Fixed Price" name="fixed_price" value="<%= results[0].fixed_price %>" required >
+                <label for="floatingInput">Fixed Price</label>
               </div>
               <% } %> 
               <% if (typeof message !="undefined" && message) { %>
