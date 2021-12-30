@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/header.ejs') %>
+
+    <body>
+        <div class="container col-md-4 mt-4">
+            <div class="row mb-3">
+                <div class="col-1">
+                    <a href="/meter_reader/confirm_reading/<% if (typeof account_no !="undefined" && account_no) { %><%= account_no %><% } %>" class="back-button-link"><h3><i class="bi bi-arrow-left"></i></h3></a>
+                </div>
+                <div class="col-10 text-center"><h3 class="text-center">Confirm Meter Reading</h3></div>    
+            </div>
+            
+            <div class="card shadow p-3 mb-3 mt-5" style=" border-radius: 25px;background-color: #FECE2F;">
+                <p>Account No: <% if (typeof account_no !="undefined" && account_no) { %><%= account_no %><% } %></p>
+                <p>Customer Name: <% if (typeof customername !="undefined" && customername) { %><%= customername %><% } %></p>
+                <h6 class="text-center large" >Your Meter Reading is</h6>
+                <input class="form-control form-control-lg" type="text" inputmode="numeric" value="<% if (typeof meterReadingFormatted !="undefined" && meterReadingFormatted) { %><%= meterReadingFormatted %><% } %>">
+                    <div class="mt-4">
+                        
+                    <form action="/meter_reader/confirm_reading/<% if (typeof account_no !="undefined" && account_no) { %><%= account_no %><% } %>" method="POST">
+                        <input type="hidden" name="meter_reading" value="<%= meterReadingFormatted %>">
+                        <input type="hidden" name="tariff" value="<% if (typeof tariff !="undefined" && tariff) { %><%= tariff %><% } %>">
+                        <input type="hidden" name="current_reading" value="<% if (typeof current_reading !="undefined" && current_reading) { %><%= current_reading %><% } %>">
+                        <input type="hidden" name="url" value="<% if (typeof url !="undefined" && url) { %><%= url %><% } %>">
+                        <input type="hidden" name="balance" value="<% if (typeof balance !="undefined" && balance) { %><%= balance %><% } %>">
+                        <input type="hidden" name="account_no" value="<% if (typeof account_no !="undefined" && account_no) { %><%= account_no %><% } %>">
+                            <h6 class="text-center" >I confirm that the reading is correct</h6>
+                        <div class="col-6 mx-auto d-grid gap-2 mb-3">
+                            <button type="submit" class="btn btn-secondary rounded-pill shadow">Confirm</button>
+                            <a type="button" class="btn btn-light rounded-pill shadow" href="/meter_reader/upload_image/<% if (typeof account_no !="undefined" && account_no) { %><%= account_no %><% } %>">Try Again</a>
+                        </div>
+                    </form>
+                </div>
+                    
+                </div>
+        </div>
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <% if (typeof alert != "undefined" && alert) { %>
+            <script>
+             const el = document.createElement('div')
+                el.innerHTML = "<a href='/meter_reader/view_bill/<% if (typeof account_no !='undefined' && account_no) { %><%= account_no %><% } %>'><button class='btn btn-success'>View Bill</button></a>"
+             swal({
+                title: "<%= alertTitle %>",
+                icon: "success",
+                button: false,
+                text:"You have submitted the meter Reading for this month",
+                closeOnClickOutside: false,
+                content: el,
+                });
+           </script>
+           <% } %>
+        <%- include('../partials/footer.ejs') %>             
+    </body>
+
+</html>

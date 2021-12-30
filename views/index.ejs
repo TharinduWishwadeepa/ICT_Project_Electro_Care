@@ -10,20 +10,20 @@
                 <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
                 <a href="/"><i class="bi bi-house-door-fill"></i> Home</a>
                 <a href="/upload_image"><i class="bi bi-arrow-up-circle"></i> Submit Reading</a>
-                <a href="#"><i class="fas fa-history"></i> Bill History</a>
-                <a href="/make_complain"><i class="fas fa-exclamation-circle"></i> Complaints</a>
+                <a href="/bill_history"><i class="fas fa-history"></i> Bill History</a>
+                <a href="/complaints"><i class="fas fa-exclamation-circle"></i> Complaints</a>
                 <a href="/view_maintenances"><i class="fas fa-calendar-times"></i> Maintanance Calender</a>
                 <hr>
                 <a href="/notifications"><i class="bi bi-bell-fill"></i> Notifications</a>
-                <a href="#"><i class="fas fa-cog"></i> Settings</a>
+                <a href="/settings"><i class="fas fa-cog"></i> Settings</a>
                 <hr>
-                <a href="/user_auth/logout"><i class="bi bi-power"></i> Logout</a>
+                <a href="/customer_auth/logout"><i class="bi bi-power"></i> Logout</a>
               </div>
 
             <div class="row mb-3">
                 <div class="col-1"><span onclick="openNav()"><h3><i class="bi bi-list"></i></h3></span></div>
-                <% if(typeof results !='undefined' && results) { %>
-                <div class="col-9 text-center"><h3>Hi, <%= results[0].name.split(" ")[0] %>  !</h3></div>
+                <% if(typeof customerData !='undefined' && customerData) { %>
+                <div class="col-9 text-center"><h3>Hi, <%= customerData[0].name.split(" ")[0] %>  !</h3></div>
                 <div class="col-2 text-end"><a href="/notifications" class="bell-button-link"><h3 style="color: #FECE2F;"><i class="bi bi-bell" ></i></h3></a></div>
             </div>
             
@@ -40,13 +40,13 @@
                 <div class="card-body text-center">
                     <h5 class="text-center">Total Amount Payable</h5>
                    
-                        <h1 class="pt-3"><span style="font-size:medium;">Rs. </span><%= results[0].balance %>
+                        <h1 class="pt-3"><span style="font-size:medium;">Rs. </span><%= customerData[0].balance %>
                         </h1>
                         <% } %>
                         
                         <div class="pt-3">  
                             <a href="" type="button" class="btn btn-secondary rounded-pill" ><span class="ms-3 me-3">Pay Now</span></a>
-                            <a href="" type="button" class="btn btn-secondary rounded-pill"><span class="ms-3 me-3">View Bills</span></a>
+                            <a href="/view_bill_latest" type="button" class="btn btn-secondary rounded-pill"><span class="ms-3 me-3">View Bill</span></a>
                     </div>
                     
                 </div>
@@ -54,7 +54,7 @@
               
               <div class="card shadow p-3 mb-3" style="border-radius: 25px;background-color: #FECE2F;">
                 <h5 class="text-center">My Usage</h5>
-                <canvas id="myChart" style="margin: 1 auto;"></canvas>
+                <canvas id="Chart" style="margin: 1 auto;"></canvas>
               </div>     
         </div>
 
@@ -63,7 +63,7 @@
         <script>
             Chart.defaults.color = "black";
             Chart.defaults.borderColor = "white";
-            const ctx = document.getElementById('myChart'); 
+            const ctx = document.getElementById('Chart'); 
             let units = JSON.parse('<%- JSON.stringify(no_of_units) %>');
             let months = JSON.parse('<%- JSON.stringify(date_of_bill) %>');
             const myChart = new Chart(ctx, {
@@ -102,6 +102,24 @@
             });           
         </script>
         <% } %> 
+        
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>      
+        
+        <% if (typeof alert != "undefined" && alert) { %>
+            <script>
+             const el = document.createElement('div')
+                el.innerHTML = "<a href='<%= link %>'><button class='btn <%= buttonType %> rounded-pill shadow'><span class='ms-3 me-3'><%= buttonTxt %></span></button></a>"
+             swal({
+                title: "<%= alertTitle %>",
+                icon: "<%= alert %>",
+                button: false,
+                text:"<%= text%>",
+                closeOnClickOutside: true,
+                content: el,
+                });
+           </script>
+           <% } %>  
+           
     </body>
 
 </html>

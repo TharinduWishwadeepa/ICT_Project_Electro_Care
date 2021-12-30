@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/header.ejs') %>
+<body>
+    <div class="container mt-3 col-4">
+        <img src="/logo.png" class="mx-auto d-block" width="200px" height="auto">
+        <h3 class="text-center mb-5">Electro Care - Area Office Login</h3>
+        <form method="POST" action="/area_office/area_office_auth/login"> 
+            <div class="mb-3  form-floating">
+              <input type="text" class="form-control" placeholder="Area ID" name="area_id">
+              <label for="floatingInput">Area ID</label>
+            </div>
+            <div class="mb-3 form-floating">
+              <input type="password" class="form-control" placeholder="Password" name="password">
+              <label for="floatingInput">Password</label>
+            </div>
+            <div class="mb-3">
+                <p class="text-end"><a href="#">Forgot Password?</a></dp>
+            </div>
+            <div>
+              <% if (typeof message != "undefined" && message) { %>
+                <div class="alert alert-danger" role="alert"><%= message %></div>
+              <% } %> 
+            </div>
+            <div class="mb-3 text-center">
+              <div class="g-recaptcha d-inline-block" data-sitekey="<%= process.env.RECAPTCHA_SITE_KEY %>" data-callback="recaptcha_callback"
+                data-expired-callback="expired_recaptcha_callback" data-size="normal" async defer></div>
+            </div>
+            <div class="col-6 mx-auto d-grid mb-3">  
+            <button type="submit" class="btn btn-primary" disabled id="submit-btn"
+            style="cursor: not-allowed;  pointer-events: all !important;">Login</button>
+        </div>  
+          </form>
+    </div>
+    <script src="https://www.google.com/recaptcha/api.js"></script>
+    <%- include('../partials/footer.ejs') %>
+</body>
+</html>

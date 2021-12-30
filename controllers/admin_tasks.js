@@ -9,7 +9,7 @@ exports.addCustomer = (req, res) => {
   const {
     account_no,
     name,
-    nic,
+    nic, 
     address,
     area_id,
     current_reading,
@@ -45,12 +45,35 @@ exports.addCustomer = (req, res) => {
   }
 };
 
+//pass data to add_customer page
+exports.renderAddCustomer = (req,res)=>{
+  try {
+    db.start.query("SELECT area_id, area_name from areaoffice",(error,officeList)=>{
+      if(!error){
+        db.start.query("SELECT tariff FROM pricing",(error,tariffList)=>{
+          if(!error){
+            return res.render("./admin/add_customer", {officeList, tariffList})
+          }
+          else{
+            console.log(error);
+          }
+        })
+      }
+      else{
+        console.log(error)
+      }
+    })
+  } catch (error) {
+    console.log(error);
+  }
+}
 //view all customers
 exports.viewAllCustomers = (req, res) => {
   try {
     db.start.query("SELECT * FROM customer", (error, results) => {
       if (!error) {
-        res.render("./admin/customers", { customersData: results });
+        res.render("./admin", { customersData: results,
+        heading:"All Customers" });
       } else {
         console.log(error);
       }
@@ -86,7 +109,27 @@ exports.viewUnregisteredCustomer = (req, res) => {
       "SELECT * FROM customer WHERE username = '' AND password = '' ",
       (error, results) => {
         if (!error) {
-          res.render("./admin/customers", { customersData: results });
+          res.render("./admin", { customersData: results,
+            heading:"Unregistered Customers" });
+        } else {
+          console.log(error);
+        }
+      }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//view registered customers
+exports.viewRegisteredCustomers = (req, res) => {
+  try {
+    db.start.query(
+      "SELECT * FROM customer WHERE username != '' AND password != '' ",
+      (error, results) => {
+        if (!error) {
+          res.render("./admin", { customersData: results,
+            heading:"Registered Customers" });
         } else {
           console.log(error);
         }
@@ -99,14 +142,16 @@ exports.viewUnregisteredCustomer = (req, res) => {
 
 //search customer
 exports.searchCustomer = (req, res) => {
-  const searchTerm = req.body.search;
+  const searchTerm = req.query.search;
   try {
     db.start.query(
       "SELECT * FROM customer WHERE account_no LIKE ? OR name LIKE ?",
       ["%" + searchTerm + "%", "%" + searchTerm + "%"],
       (error, results) => {
         if (!error) {
-          res.render("./admin/customers", { customersData: results });
+          res.render("./admin", { customersData: results,
+            heading:`Search results: "${req.query.search}"`,
+          searchTerm:req.query.search});
         } else {
           console.log(error);
         }
@@ -211,6 +256,62 @@ exports.deleteCustomer = (req, res) => {
     console.log(error);
   }
 };
+
+//view complaints
+exports.viewComplaints = (req,res)=>{
+  try {
+    //WHERE complain_to = 'admin'
+    //select complaint records
+    db.start.query("SELECT * FROM complain ",(error,results)=>{
+      if(!error){
+        //count of all complaints --- AND complain_to = 'admin'
+        db.start.query("SELECT COUNT(complain_id) AS countAll FROM complain",(error,countAll)=>{
+          if(!error){
+            //count of new complaints  --- AND complain_to = 'admin' 
+            db.start.query("SELECT COUNT(complain_id) AS countNew FROM complain WHERE status = 'Pending'",(error,countNew)=>{
+              if(!error){
+                //count of in progress --- AND complain_to = 'admin'
+                db.start.query("SELECT COUNT(complain_id) AS countInProgress FROM complain WHERE status = 'In Progress'",(error,countInProgress)=>{
+                  if(!error){
+                    //count of completed --- AND complain_to = 'admin'
+                    db.start.query("SELECT COUNT(complain_id) AS countCompleted FROM complain WHERE status = 'Completed'",(error,countCompleted)=>{
+                      if(!error){
+                        return res.render('./admin/complaints',{
+                          Complains: results,
+                          countAll: countAll[0].countAll,
+                          countNew: countNew[0].countNew,
+                          countInProgress: countInProgress[0].countInProgress,
+                          countCompleted: countCompleted[0].countCompleted
+                        })
+                      }
+                      else{
+                        console.log(error);
+                      }
+                    })
+                  }
+                  else{
+                    console.log(error);
+                  }
+                })
+              }
+              else{
+                console.log(error);
+              }
+            })
+          }
+          else{
+            console.log(error);
+          }
+        })  
+      }
+      else{
+        console.log(error);
+      }
+    })
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 //change the status of the user
 
@@ -409,7 +510,9 @@ exports.viewAllAreaOffices = (req, res) => {
   try {
     db.start.query("SELECT * FROM areaoffice", (error, results) => {
       if (!error) {
-        res.render("./admin/area_offices", { Data: results });
+        
+        res.render("./admin/area_offices", { Data: results,
+        heading:"Area Officers" });
       } else {
         console.log(error);
       }
@@ -525,14 +628,17 @@ exports.deleteAreaOffice = (req, res) => {
 
 //search Area Office
 exports.searchAreaOffice = (req, res) => {
-  const searchTerm = req.body.search;
+  const searchTerm = req.query.search;
   try {
     db.start.query(
       "SELECT * FROM areaoffice WHERE area_id LIKE ? OR area_name LIKE ? OR province LIKE ?",
       ["%" + searchTerm + "%", "%" + searchTerm + "%", "%" + searchTerm + "%"],
       (error, results) => {
         if (!error) {
-          res.render("./admin/area_offices", { Data: results });
+          res.render("./admin/area_offices", { Data: results, 
+            searchTerm:req.query.search,
+            heading:`Search results: "${searchTerm}"`, 
+            title:"Search Results" });
         } else {
           console.log(error);
         }
@@ -556,7 +662,76 @@ exports.resetPWAreaOffice = (req, res) => {
 //add meter reader
 exports.addMeterReader = (req,res)=>{
   try {
-    
+    const {
+      reader_id,
+      name,
+      contact_no,
+      area_id,
+      password,
+      conf_password,
+    } = req.body;
+    //check empty or not
+    if (
+      !reader_id ||
+      !name ||
+      !contact_no ||
+      !area_id ||
+      !password ||
+      !conf_password
+    ) {
+      return res.status(400).render("admin/add_meter_reader", {
+        messageWarning: "Please provide required fields",
+        title: "Add Meter Reader",
+      });
+    }
+    //check passwords
+    else if (password != conf_password) {
+      return res.render("admin/add_meter_reader", {
+        messageWarning: "Passwords do not match!",
+        title: "Add Meter Reader",
+      });
+    }
+    try {
+      //check if the meter reader exists
+      db.start.query(
+        "SELECT * FROM meter_reader WHERE reader_id = ?",
+        [reader_id],
+        async (error, results) => {
+          if (results.length > 0) {
+            return res.render("admin/add_meter_reader", {
+              messageWarning: "Already Registered!",
+              title: "Add Meter Reader",
+            });
+          } else {
+            const hashedPW = await bcrypt.hash(password, 10);
+            db.start.query(
+              "INSERT INTO meter_reader SET ?",
+              [
+                {
+                  reader_id: reader_id,
+                  name: name,
+                  contact_no: contact_no,
+                  area_id: area_id,
+                  password: hashedPW,
+                },
+              ],
+              (error, results) => {
+                if (!error) {
+                  return res.render("admin/add_meter_reader", {
+                    message: "Meter Reader Registered Successfully!",
+                    title: "Add Meter Reader",
+                  });
+                } else {
+                  console.log(error);
+                }
+              }
+            );
+          }
+        }
+      );
+    } catch (error) {
+      console.log(error);
+    }
   } catch (error) {
     
   }
@@ -564,9 +739,10 @@ exports.addMeterReader = (req,res)=>{
 //view all Meter Readers
 exports.viewAllMeterReaders = (req, res) => {
   try {
-    db.start.query("SELECT * FROM meter_reader", (error, results) => {
+    db.start.query("SELECT * FROM meter_reader INNER JOIN areaoffice ON meter_reader.area_id = areaoffice.area_id", (error, results) => {
       if (!error) {
-        res.render("./admin/meter_readers", { Data: results });
+        res.render("./admin/meter_readers", { Data: results,
+          heading:"Meter Readers" });
       } else {
         console.log(error);
       }
@@ -587,6 +763,18 @@ exports.viewMeterReader = (req, res) => {
 //edit Meter Reader - Send the editing data to the form
 exports.editMeterReader = (req, res) => {
   try {
+    db.start.query(
+      "SELECT * FROM meter_reader WHERE reader_id = ?",
+      [req.params.id],
+      (error, results) => {
+        if (!error) {
+          console.log(results);
+          res.render("./admin/edit_meter_reader", { Data: results });
+        } else {
+          console.log(error);
+        }
+      }
+    );
   } catch (error) {
     console.log(error);
   }
@@ -610,7 +798,19 @@ exports.deleteMeterReader = (req, res) => {
 
 //search meter reader
 exports.searchMeterReader = (req, res) => {
+  const searchTerm = req.query.search;
   try {
+    db.start.query("SELECT * FROM meter_reader INNER JOIN areaoffice ON meter_reader.area_id = areaoffice.area_id WHERE reader_id LIKE ? OR name LIKE ? OR area_name LIKE ?",
+    ["%" + searchTerm + "%", "%" + searchTerm + "%", "%" + searchTerm + "%"], (error, results) => {
+      if (!error) {
+        res.render("./admin/meter_readers", { Data: results,
+          searchTerm:req.query.search,
+          heading:`Search results: "${searchTerm}"`,
+        title:"Search results" });
+      } else {
+        console.log(error);
+      }
+    });
   } catch (error) {
     console.log(error);
   }

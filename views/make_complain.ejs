@@ -11,12 +11,20 @@
             
             <form action="/make_complain" method="post">
                 <div class="mb-3">
+                    <label class="form-label">Complain To</label>
+                    <select class="form-select" name="complain_to">
+                        <option selected value="area_office">Area Office</option>
+                        <option value="admin">Head Office</option>   
+                    </select>
+                </div>
+                <div class="mb-3">
                     <label class="form-label">Complain Type</label>
                     <select class="form-select" name="type">
                         <option selected>Select Complain type</option>
                         <option value="Power Cut">Power Cut</option>
-                        <option value="2">Two</option>
-                        <option value="3">Three</option>
+                        <option value="Broken Power Line">Broken Power Line</option>
+                        <option value="Damage from Thundering">Damage from Thundering</option>
+                        <option value="Other">Other</option>
                     </select>
                 </div>
                 <div class="mb-3">
@@ -34,11 +42,11 @@
                         </div>
                         <% } %>
                 <div class="col-6 mx-auto d-grid mt-4 mb-3">
-                    <button type="submit" class="btn btn-secondary">Submit Complain</button>
+                    <button type="submit" class="btn btn-secondary rounded-pill">Submit Complain</button>
                   </div>
 
             </form>
-            <div class="row mb-3">
+            <div class="row mb-3 card p-3">
                 <p>Use this form to make complains about power cuts and other types of complains.
                     Your complain will recieve to your Electricity Area Office.
                 </p>

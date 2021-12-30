@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/solid.css">
+<%- include('../partials/header.ejs') %>
+
+    <body>
+        <div class="container col-md-4 mt-3">
+            <div id="mySidenav" class="sidenav">
+                <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+                <a href="/meter_reader"><i class="bi bi-house-door-fill"></i> Home</a>
+                <a href="/meter_reader/settings"><i class="fas fa-cog"></i> Settings</a>
+                <a href="/meter_reader/meter_reader_auth/logout"><i class="bi bi-power"></i> Logout</a>
+            </div>
+
+              <div class="row mb-3">
+                <div class="col-1"><span onclick="openNav()"><h3><i class="bi bi-list"></i></h3></span></div>
+                <div class="col-10 text-center"><h4>Customer List</h4></div>
+                <form action="/meter_reader/search" method="post">
+                    <input class="form-control rounded-pill" type="text" name="search" placeholder="&#xf002; Search Customer" style="font-family:Segoe UI, 'Font Awesome 5 Free'" >
+                </form>
+            </div>
+                <div class="card mb-2" style=" border-top-left-radius: 25px;border-top-right-radius: 25px; background-color: #E9E9E9;">
+                    <div class="card-body text-center">
+                        <% if(typeof customersData !='undefined' && customersData.length!=0){ var i=1; customersData.forEach(function(data){%> 
+                            <a href="/meter_reader/upload_image/<%= data.account_no %>" class="text-decoration-none" style="color:black;">
+                            <div class="row">
+                                <div class="col-2 mt-2">
+                                    <span class="fa-stack" style="vertical-align: top;">
+                                        <i class="fas fa-circle fa-stack-2x" style="color: #50D3EE;"></i>
+                                        <i class="fas fa-user fa-stack-1x fa-inverse"></i>
+                                    </span>  
+                                </div>
+                                <div class="col-8 ps-0 text-start">
+                                    <h6><b><%= data.name %> </b></h6> 
+                                    <p class="small" style="margin-bottom: 0rem !important;"><%= data.address %></p>  
+                                    <span class="small">Acc. No: <%= data.account_no %></span> 
+                                </div>
+                                <div class="col-2 mt-2">
+                                    <% if(data.bill_id == null){ %>  
+                                        <span class="fa-stack" style="vertical-align: top;">
+                                            <i class="fas fa-circle fa-stack-2x" style="color: #EE5055;"></i>
+                                            <i class="fas fa-times fa-stack-1x fa-inverse"></i>
+                                          </span>                 
+                                    <% } %> 
+                                    <% if(data.bill_id != null) {%>
+                                        <span class="fa-stack" style="vertical-align: top;">
+                                            <i class="fas fa-circle fa-stack-2x" style="color: #198754;"></i>
+                                            <i class="fas fa-check fa-stack-1x fa-inverse"></i>
+                                          </span> 
+                                    <% } %> 
+                                </div>
+                            </div>
+                        </a>
+                                <hr style="border: none; color: white; opacity: 100% !important; max-width: 100%;">
+                        <% i++; }) }%>
+                    </div>       
+                    </div>           
+              </div>
+        </div>
+        <%- include('../partials/footer.ejs') %>
+    </body>
+
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('./partials/header.ejs') %>
+
+    <body>
+        <div class="container col-md-4 mt-3">
+            <div class="row mb-3">
+                <div class="col-2"><a href="/" class="back-button-link"><h3><i class="bi bi-arrow-left"></i></h3></a></div>
+                <div class="col-9 text-center ps-0"><h4>Bill History</h4></div>
+            </div>
+            <div class="card shadow p-2 mb-2" style="border-radius: 25px;background-color: #FECE2F;">
+                <div class="card-body text-center">
+                    <h5 class="text-center">Total Amount Payable</h5>
+                    <% if(typeof customerData != "undefined" && customerData){ %>                    
+                        <h1 class="pt-3"><span style="font-size:medium;">Rs. </span><%= customerData[0].balance  %> 
+                        </h1>
+                        <% } %>
+                </div>
+              </div>
+              <div class="mt-3">
+                  <h5>Previous Bills</h5>
+              </div>
+              <% if(typeof billHistory != "undefined" && billHistory.length != 0){ var i=1; billHistory.forEach(function(data){%> 
+              <a href="/view_bill/<%= data.bill_id %>" style="text-decoration: none; color: black;">
+                <div class="card shadow p-3 mb-3" style="border-radius: 15px;background-color: #E5E5E5;">
+               <div class="row">
+                <div class="col-8">
+                    <p style="font-size: small;font-weight: bold;"><%= moment(data.date_of_bill).format('LL') %></p>
+                    <span style="font-size: large;font-weight: bold;">Rs. <%= data.total_payable %></span>
+                   </div> 
+                   <div class="col-4 text-end">
+                    <% if(data.payment=='0'){ %> 
+                        <p class="text-danger fw-bold">Not Paid</p>
+                        <% }else{ %> 
+                        <p class="text-primary fw-bold">Paid</p>
+                        <% } %> 
+                    <h5><i class="fas fa-arrow-to-bottom"></i></h5>
+                   </div>
+               </div>
+              </div>
+            </a>
+              <% i++; }) }%> 
+        </div>
+
+        <%- include('./partials/footer.ejs') %>
+    </body>
+
+</html>

@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-<%- include('./partials/header.ejs') %>
+<%- include('../partials/header.ejs') %>
+
     <body style="background-color: #F3F3F3;">
         <div class="container col-md-4 mt-3">
             <div class="row mb-3">
-                <div class="col-1"><a href="/" class="back-button-link"><h3><i class="bi bi-arrow-left"></i></h3></a></div>
+                <div class="col-1"><a href="/meter_reader" class="back-button-link"><h3><i class="bi bi-arrow-left"></i></h3></a></div>
                 <div class="col-10 text-center"><h3>My Bill</h3></div>
             </div>
             <div class="card shadow p-3 pb-2 mb-3" style="border-radius: 25px;">
@@ -29,7 +30,8 @@
                         <p>Total No. of Units Consumed : </p>
                         <p>Fixed Charge :</p>
                         <p>Charge for Units Consumed :</p>
-                        <p>Balance Brought Forward :</p>     
+                        <p>Balance Brought Forward :</p> 
+                        
                     </div>
                     <div class="col-3 text-end fw-bold text-secondary">
                         <p><% if (typeof bill_results !="undefined" && bill_results) { %><%= bill_results[0].no_of_units%><% } %></p>
@@ -47,15 +49,18 @@
                         <h5><% if (typeof bill_results !="undefined" && bill_results) { %><%= bill_results[0].total_payable %><% } %></h5>
                     </div>  
                 </div>
-                <div class="mt-4 text-center">
-                    <a href="" type="button" class="btn btn-primary rounded-pill" ><span class="ms-3 me-3">Pay Now</span></a>
-                </div>
                 <div class="mt-3 mb-3 text-center">
-                    <a href="/download/<% if (typeof bill_results !="undefined" && bill_results) { %><%= bill_results[0].bill_id%><% } %>">Download as PDF</a>
+                    <a href="/meter_reader/download/<% if (typeof bill_results !="undefined" && bill_results) { %><%= bill_results[0].bill_id%><% } %>">Download as PDF</a>
                 </div>
-            </div>         
+                
+                
+           
+            </div>
+           
         </div>
-        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>             
+
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>      
+        
         <% if (typeof alert != "undefined" && alert) { %>
             <script>
              const el = document.createElement('div')
@@ -70,7 +75,8 @@
                 });
            </script>
            <% } %>  
-        <%- include('./partials/footer.ejs') %>
+        <%- include('../partials/footer.ejs') %>
+
     </body>
  
 </html>

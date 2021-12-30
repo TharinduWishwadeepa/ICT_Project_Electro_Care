@@ -1,0 +1,99 @@
+<%- include('../partials/header_admin.ejs') %>
+    <link rel="stylesheet" href="https://cdn.statically.io/gh/TharinduWishwadeepa/hosting/main/addcustomer_style.css">
+
+    <body>
+        <div class="container">
+            <%- include('../partials/officer_nav.ejs') %>
+                <!--main-->
+                <div class="main">
+                    <div class="topbar" style="padding-top: 30px;">
+                        <div class="toggle">
+                            <i class="fal fa-bars"></i>
+                        </div>
+                        <!--search-->
+                        <h2>Add a Customer</h2>
+                        <!--User Image-->
+                        <div class="user">
+                            <img src="user.jpg">
+                        </div>
+                    </div>
+                    <!--Details list-->
+                    <div class="details2">
+                        <div class="recentDetails2">
+                            <form action="/admin/add_customer" method="post">
+                                <div class="form-input">
+                                    <span><i class="fas fa-user"></i></span>
+                                    <input type="text" name="account_no" placeholder="Enter Account Number" required>
+                                </div>
+                                <div class="form-input">
+                                    <span><i class="fas fa-user"></i></span>
+                                    <input type="text" name="name" placeholder="Enter Full Name" required>
+                                </div>
+                                <div class="form-input">
+                                    <span><i class="fa fa-id-card" aria-hidden="true"></i></span>
+                                    <input type="text" name="" placeholder="Enter your ID/Passport No" required>
+                                </div>                        
+                                <div class="form-input">
+                                    <span> <i class="fa fa-map-marker" aria-hidden="true"></i></span>
+                                    <input type="text" name="address" placeholder="Enter address">
+                                </div>
+                                <div class="form-input">
+                                    <span> <i class="fa fa-map-marker" aria-hidden="true"></i></span>
+                                    <input type="number" name="current_reading" placeholder="Enter current reading">
+                                </div>
+                                <div class="form-input">
+                                    <span> <i class="fa fa-map-marker" aria-hidden="true"></i></span>
+                                    <input type="number" step="0.01" name="balance" placeholder="Enter current balance">
+                                </div>
+                                <div class="form-input">
+                                    <span><i class="fa fa-list" aria-hidden="true"></i> </span>
+                                    <select class="custom-select2">
+                                        <option value="AL">Select Tariff</option>
+                                         <% if(typeof tariffList !='undefined' && tariffList){ var i=1; tariffList.forEach(function(data){ %>
+                                            <option value="<%= data.tariff %>"><%= data.tariff %></option>
+                                            <% i++; })} %>   
+                                    </select>
+                                </div>
+
+                                <div class="form-input">
+                                    <span><i class="fa fa-building" aria-hidden="true"></i> </span><select
+                                        class="custom-select2">
+                                        <option value="AL">Select Your Area Office</option>
+                                        <% if(typeof officeList !='undefined' && officeList){ var i=1; officeList.forEach(function(data){ %>
+                                            <option value="<%= data.area_id %>"><%= data.area_name %></option>
+                                            <% i++; })} %>
+                                    </select>
+                                </div>
+                                <input type="submit" class="btn2" value="Save">
+                                <input type="reset" class="btn3" value="Cancel">
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+        </div>
+
+        <script>
+            //MenuToggle
+            let toggle = document.querySelector('.toggle');
+            let navigation = document.querySelector(' .navigation');
+            let main = document.querySelector('.main');
+
+            toggle.onclick = function () {
+                navigation.classList.toggle('active');
+                main.classList.toggle('active');
+            }
+            //add hovered class in selected liste item 
+
+            let list = document.querySelectorAll('.navigation li');
+            function activeLink() {
+                list.forEach((item) =>
+                    item.classList.remove('hovered'));
+                this.classList.add('hovered');
+            }
+            list.forEach((item) =>
+                item.addEventListener('mouseover', activeLink));
+        </script>
+    </body>
+
+    </html>

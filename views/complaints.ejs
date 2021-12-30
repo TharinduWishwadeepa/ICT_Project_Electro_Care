@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('./partials/header.ejs') %>
+
+    <body>
+        <div class="container col-md-4 mt-3">
+            <div class="row mb-3">
+                <div class="col-1"><a href="/" class="back-button-link"><h3><i class="bi bi-arrow-left"></i></h3></a></div>
+                <div class="col-10 text-center"><h4>Complaints</h4></div>
+            </div>
+
+            <% if(typeof results !='undefined' && results.length!=0){ var i=1; results.forEach(function(data){%> 
+            <div class="card shadow p-3 pb-2 mb-3" style="border-radius: 10px; background-color: #EFEFEF;">
+                <div class="row">
+                    <div class="row">
+                        <div class="col-8">
+                            <h5><%= data.type %></h5>
+                        </div>
+                        <div class="col-4 text-end">
+                            <span class="badge bg-info"><%= data.status %></span>
+                        </div>
+                        <p style="white-space: pre-wrap"><%= data.description %></p> 
+                        <span style="font-size:x-small;" class="text-end"><i class="bi bi-clock"></i> <%= moment(data.datetime).fromNow() %></span>
+                    </div>  
+                </div>
+            </div>
+            <% i++; }) }%>
+            <div class="text-center">
+                <a href="/make_complain" type="button" class="btn btn-secondary rounded-pill"><span class="ms-3 me-3">New Complaint</span></a>
+            </div>
+           
+        </div>
+        <%- include('./partials/footer.ejs') %>
+    </body>
+
+</html>

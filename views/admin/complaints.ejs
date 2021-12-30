@@ -1,0 +1,129 @@
+<%- include('../partials/header_admin.ejs') %> 
+<body>
+    <div class="container">
+        <%- include('../partials/admin_nav.ejs') %>  
+        <!--main-->
+        <div class="main">
+            <div class="topbar">
+                <div class="toggle">
+                   <ion-icon name="menu-outline"></ion-icon> 
+                 </div>
+                <!--search-->
+                <div class="search">
+                    <label>
+                        <input type="text" placeholder="search here">
+                        <i class="fas fa-search"></i>
+                    </label>
+                </div>
+                <!--User Image-->
+                <div class="user">
+                    <img src="user.jpg">
+                </div>
+            </div> 
+            <!--cards-->
+             <div class="cardBox">
+                 <div class="card">
+                     <div>
+                         <div class="numbers"><% if((typeof countAll !='undefined') && countAll) {%><%= countAll %><% } %></div>
+                         <div class="cardName">All</div>
+                     </div>
+                     <div class="iconBx">
+                         <ion-icon name="eye-outline"></ion-icon>
+                     </div>
+                 </div>
+                 <div class="card">
+                    <div>
+                        <div class="numbers"><% if((typeof countNew !='undefined') && countNew) {%><%= countNew %><% } %></div>
+                        <div class="cardName">New</div>
+                    </div>
+                    <div class="iconBx">
+                        <ion-icon name="newspaper-outline"></ion-icon>
+                    </div>
+                </div>
+                <div class="card">
+                    <div>
+                        <div class="numbers"><% if((typeof countInProgress !='undefined')) {%><%= countInProgress %><% } %></div>
+                        <div class="cardName">In progress</div>
+                    </div>
+                    <div class="iconBx">
+                        <ion-icon name="code-outline"></ion-icon>
+                    </div>
+                </div>
+                <div class="card">
+                    <div>
+                        <div class="numbers"><% if((typeof countCompleted !='undefined')) {%><%= countCompleted %><% } %></div>
+                        <div class="cardName">Completed</div>
+                    </div>
+                    <div class="iconBx">
+                        <ion-icon name="code-working-outline"></ion-icon>
+                    </div>
+                </div> 
+             </div>
+             <!--Details list-->
+             <div class="details">
+                 <div class="recentDetails">
+                     <div class="cardHeader">
+                     <h3>Complaints</h3>
+                     <a href="#" class="btn">View All</a>
+                     </div>
+                     <table>
+                         <thead>
+                             <tr>
+                                 <td>#</td>
+                                 <td>Complain ID</td>
+                                 <td>Date and Time</td>
+                                 <td>Complain Type</td>
+                                 <td>Account No</td>
+                                 <td>Status</td>
+                                 <td></td>
+                             </tr>   
+                         </thead>
+                         <tbody>
+                            <% if(typeof Complains !='undefined' && Complains.length!=0){ var i=1; Complains.forEach(function(data){ %>
+                             <tr>
+                                 <td><%= i %></td>
+                                 <td><%= data.complain_id %></td>
+                                 <td><%= moment(data.datetime).format("YYYY-MM-DD HH:mm") %></td>
+                                 <td><%= data.type %></td>
+                                 <td><%= data.account_no %></td>
+                                 <td><%= data.status %></td>
+                                 <td><span class="status delivered1"><i class="far fa-eye"></i></span></td>
+                             </tr>
+                             <% i++; }) %>
+                                    <% } else{ %>
+                                        <tr>
+                                            <td colspan="7" style="text-align: center;">No Data Found</td>
+                                        </tr>
+                                    <% } %>
+                         </tbody>
+                     </table>
+                </div>
+             </div>
+
+        </div>
+    </div>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>   
+    <script>
+        //MenuToggle
+        let toggle=document.querySelector('.toggle');
+        let navigation=document.querySelector(' .navigation');
+        let main=document.querySelector('.main');
+
+        toggle.onclick=function(){
+            navigation.classList.toggle('active');
+            main.classList.toggle('active');          
+        }
+        //add hovered class in selected liste item 
+
+        let list=document.querySelectorAll('.navigation li');
+        function activeLink(){
+            list.forEach((item)=>
+            item.classList.remove('hovered'));
+            this.classList.add('hovered');
+        } 
+        list.forEach((item)=>
+        item.addEventListener('mouseover',activeLink));
+    </script>
+</body>
+</html>

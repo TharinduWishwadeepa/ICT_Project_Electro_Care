@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const notify = require('./notifications');
 var cloudinary = require("cloudinary").v2;
+const PDFDocument = require('pdfkit');
 
 //cloudinary configuration
 cloudinary.config({
@@ -26,7 +27,7 @@ exports.getAccountNo = (req, res) => {
 exports.getCustomerData = (account_no, callback) => {
   try {
     db.start.query(
-      "SELECT name, area_id, balance, tariff, current_reading,username FROM customer WHERE account_no = ?",
+      "SELECT account_no, name, area_id, balance, tariff, current_reading,username FROM customer WHERE account_no = ?",
       [account_no],
       (error, results) => {
         if (!error) {
@@ -144,7 +145,7 @@ exports.viewNotifications = (req, res) => {
 
 //make complain
 exports.makeComplain = (req, res) => {
-  let { type, description } = req.body;
+  let { complain_to, type, description } = req.body;
   let account_no = this.getAccountNo(req, res);
   if (!type || type == "Select Complain type" || !description) {
     return res.status(400).render("make_complain", {
@@ -154,6 +155,13 @@ exports.makeComplain = (req, res) => {
   }
   this.getCustomerData(account_no, (error, results) => {
     let area_id = results[0].area_id;
+    let comp_to;
+    if(complain_to =="area_office"){
+      comp_to = area_id;
+    }
+    else if(complain_to =="admin"){
+      comp_to = "admin";
+    }
     try {
       db.start.query(
         "INSERT INTO complain SET ?",
@@ -162,7 +170,7 @@ exports.makeComplain = (req, res) => {
             type: type,
             description: description,
             account_no: account_no,
-            area_id: area_id,
+            complain_to: comp_to,
             status: "Pending",
           },
         ],
@@ -174,7 +182,7 @@ exports.makeComplain = (req, res) => {
                 type: "Complain",
                 title: "Customer Complain",
                 description: `${account_no} has made a complain`,
-                notification_to: area_id,
+                notification_to: comp_to,
                 notification_from: account_no,
                 link: results.insertId,
               };
@@ -203,17 +211,16 @@ exports.makeComplain = (req, res) => {
   });
 };
 
-//view complain
+//view complaints
 exports.viewComplain = (req, res) => {
   try {
     let account_no = this.getAccountNo(req, res);
     db.start.query(
-      "SELECT * FROM complain WHERE status = 'pending' AND account_no = ? ORDER BY datetime DESC LIMIT 1 ",
+      "SELECT * FROM complain WHERE status = 'pending' AND account_no = ? ORDER BY datetime DESC ",
       [account_no],
       (error, results) => {
         if (!error) {
-          console.log(results);
-          return res.render("view_complain", { results });
+          return res.render("complaints", { results });
         } else {
           console.log(error);
         }
@@ -424,7 +431,7 @@ exports.uploadImage = (req, res, next) => {
 exports.checkBillThisMonth = (account_no, callback) => {
   try {
     db.start.query(
-      "SELECT * FROM bill WHERE account_no = ? AND ( MONTH(date_of_bill) = MONTH(CURRENT_DATE()) AND YEAR(date_of_bill) = YEAR(CURRENT_DATE()) )",
+      "SELECT * FROM bill WHERE acc_no = ? AND ( MONTH(date_of_bill) = MONTH(CURRENT_DATE()) AND YEAR(date_of_bill) = YEAR(CURRENT_DATE()) )",
       [account_no],
       (error, results) => {
         let bill;
@@ -435,6 +442,40 @@ exports.checkBillThisMonth = (account_no, callback) => {
         } else if (results.length == 1) {
           bill = "have_bill";
           return callback(null, bill);
+        }
+      }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//get the bill of current month
+exports.billThisMonth = (req,res) => {
+  try {
+    let account_no = this.getAccountNo(req, res);
+    db.start.query(
+      "SELECT * FROM bill WHERE acc_no = ? AND ( MONTH(date_of_bill) = MONTH(CURRENT_DATE()) AND YEAR(date_of_bill) = YEAR(CURRENT_DATE()) )",
+      [account_no],
+      (error, bill_results) => {
+        if (bill_results.length == 0) {
+          console.log(error)
+        } else if (bill_results.length == 1) {
+          this.getCustomerData(account_no,(error,customerData)=>{
+            if(!error){
+              this.getPricing(customerData[0].tariff,(error,pricing)=>{ 
+                if(!error){
+                  return res.render("view_bill", {bill_results,customerData,pricing});
+                }
+                else{
+                  console.log(error);
+                }
+              })  
+            }
+            else{
+              console.log(error);
+            }
+          })
         }
       }
     );
@@ -482,25 +523,18 @@ exports.generateBill = (req, res) => {
             total =
               b1_30 * 30 + b31_60 * 30 + b61_90 * 30 + b91_105 * remainder;
           }
-          payableAmount = total + parseFloat(balance) + parseFloat(fixed_price);
-          var today = new Date();
-          var dateToday =
-            today.getFullYear() +
-            "-" +
-            (today.getMonth() + 1) +
-            "-" +
-            today.getDate();
-          var month = today.getFullYear() + "-" + (today.getMonth() + 1);
+          let cost_of_usage = total + parseFloat(fixed_price);
+          payableAmount = cost_of_usage + parseFloat(balance);
           //add a bill
           db.start.query(
             "INSERT INTO bill SET ?",
             [
               {
-                account_no: account_no,
-                date_of_bill: dateToday,
+                acc_no: account_no,
                 reading: meter_reading,
                 no_of_units: no_of_units,
-                total: total,
+                cost_of_usage: cost_of_usage,
+                total_payable: payableAmount,
                 image: url,
                 markedby: "User",
               },
@@ -541,50 +575,43 @@ exports.generateBill = (req, res) => {
   }
 };
 
-//view bill of this month
+//view bill
 exports.viewBill = (req, res) => {
   try {
     let account_no = this.getAccountNo(req, res);
-
     //select bill of current month
-    db.start.query(
-      "SELECT * FROM bill WHERE account_no = ? AND ( MONTH(date_of_bill) = MONTH(CURRENT_DATE()) AND YEAR(date_of_bill) = YEAR(CURRENT_DATE()) )",
-      [account_no],
+    db.start.query("SELECT * FROM bill WHERE acc_no = ? AND bill_id = ?",
+      [account_no, req.params.bill_id],
       (error, bill_results) => {
-        if (bill_results.length == 0) {
-          // if there is no bill
-          res.render("view_bill");
-        } else if (bill_results) {
-          // if there is a bill
-          total = bill_results[0].total;
-          //get customer data
-          this.getCustomerData(account_no, (error, customer_data) => {
-            if (error) {
-              console.log(error);
-            } else {
-              //get pricings
-              this.getPricing(
-                customer_data[0].tariff,
-                (error, pricing_results) => {
-                  if (!error) {
-                    //display bill
-                    res.render("view_bill", {
-                      total,
-                      customer_data,
-                      pricing_results,
-                      bill_results,
-                      title: "View Bill",
-                    });
-                  }
+        if(bill_results.length > 0){
+          this.getCustomerData(account_no,(error,customerData)=>{
+            if(!error){
+              this.getPricing(customerData[0].tariff,(error,pricing)=>{ 
+                if(!error){
+                  return res.render("view_bill", {bill_results,customerData,pricing});
                 }
-              );
+                else{
+                  console.log(error);
+                }
+              })  
             }
+            else{
+              console.log(error);
+            }
+          })    
+        } 
+        else {
+          res.render("index", {
+            alert:"error",
+            alertTitle:"Ooops !",
+            title: "No Bill Available!",
+            text:"No Bill Available for this month. Please Upload meter reading !",
+            link:"/upload_image",
+            buttonType:"btn-secondary",
+            buttonTxt:"Upload Meter Reading"
           });
-        } else if (error) {
-          console.log(error);
         }
-      }
-    );
+      });
   } catch (error) {
     console.log(error);
   }
@@ -620,7 +647,7 @@ exports.viewMaintenances = (req, res) => {
 //get usage
 exports.getUsage = (account_no,callback)=>{
   try {
-    db.start.query('SELECT no_of_units, date_of_bill FROM bill WHERE account_no = ? ORDER BY date_of_bill DESC LIMIT 8',
+    db.start.query('SELECT no_of_units, date_of_bill FROM bill WHERE acc_no = ? ORDER BY date_of_bill DESC LIMIT 8',
     [account_no],(error,usage)=>{
       if(!error){
         return callback(null, usage);
@@ -633,4 +660,21 @@ exports.getUsage = (account_no,callback)=>{
     console.log(error);
   }
 
-}
+};
+
+//bill history - get list of bills
+exports.billHistory = (account_no,callback)=>{
+  try {
+    db.start.query('SELECT * FROM bill WHERE acc_no = ? ORDER BY date_of_bill DESC LIMIT 24',
+    [account_no],(error,billHistory)=>{
+      if(!error){
+        return callback(null, billHistory);
+      }
+      else{
+        return callback(error, null);
+      }
+    })
+  } catch (error) {
+    
+  }
+};

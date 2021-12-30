@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-<%- include('./partials/header.ejs') %>
+<%- include('../partials/header.ejs') %>
 
   <body>
     <div class="container col-md-4 mt-3">
       <img src="/logo.png" class="mx-auto d-block" width="200px" height="auto">
       <h3 class="text-center mb-5">Welcome Back!</h3>
-      <form method="POST" action="/user_auth/login">
+      <form method="POST" action="/meter_reader/meter_reader_auth/login">
         <div class="mb-3  form-floating">
-          <input type="text" class="form-control" placeholder="Username" name="username">
-          <label for="floatingInput">Username</label>
+          <input type="text" class="form-control" placeholder="Reader ID" name="reader_id">
+          <label for="floatingInput">Reader ID</label>
         </div>
         <div class="mb-3 form-floating">
           <input type="password" class="form-control" placeholder="Password" name="password">
@@ -35,10 +35,10 @@
             style="cursor: not-allowed;  pointer-events: all !important;">Login</button>
         </div>
       </form>
-      <p class="text-center">Don't have an account? <a href="/register" class="text-decoration-none"><b>Register</b></a>
       </p>
     </div>
-    <%- include('./partials/footer.ejs') %>
+    <script src="https://www.google.com/recaptcha/api.js"></script>
+    <%- include('../partials/footer.ejs') %>
 
   </body>
 

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<%- include('./partials/header.ejs') %>
+<%- include('../partials/header.ejs') %>
 <style>
     .image-upload>input {
   display: none;
@@ -14,15 +14,16 @@
         
         <div class="container col-md-4 mt-3">
             <div class="row mb-3">
-                <div class="col-1"><a href="/" class="back-button-link"><h3><i class="bi bi-arrow-left"></i></h3></a></div>
+                <div class="col-1"><a href="/meter_reader" class="back-button-link"><h3><i class="bi bi-arrow-left"></i></h3></a></div>
                 <div class="col-10 text-center"><h3>Upload Meter Reading</h3></div>
             </div>
             <div class="card shadow p-3 mb-3" style=" border-radius: 25px; background-color: #FECE2F;">
                 <div class="card-body text-center">
-                    <form action="/upload_image" method="POST" enctype="multipart/form-data">
+                    <form action="/meter_reader/upload_image/<% if (typeof account_no !="undefined" && account_no) { %><%= account_no %><% } %>" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="account_no" value="<% if (typeof account_no !="undefined" && account_no) { %><%= account_no %><% } %>">
                         <div class="image-upload">
                             <label for="file-input">
-                              <img src="imageup.png" class="img-fluid" width="auto">
+                              <img src="https://cdn.statically.io/gh/TharinduWishwadeepa/hosting/main/imageup.png" class="img-fluid" width="auto">
                             </label>
                             <input type="file" accept="image/*" capture="environment" name="photo" id="file-input">                           
                           </div>
@@ -51,7 +52,7 @@
                 });
            </script>
            <% } %>  
-        <%- include('./partials/footer.ejs') %>
+        <%- include('../partials/footer.ejs') %>
     </body>
 
 </html>

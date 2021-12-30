@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/header.ejs') %>
+
+    <body style="background-color: #FECE2F;">
+        <div id="mySidenav" class="sidenav">
+            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+            <a href="/meter_reader"><i class="bi bi-house-door-fill"></i> Home</a>
+            <a href="/meter_reader/settings"><i class="fas fa-cog"></i> Settings</a>
+            <a href="/meter_reader/meter_reader_auth/logout"><i class="bi bi-power"></i> Logout</a>
+          </div>
+
+        <div class="container-fluid col-md-4 mt-3" >
+            <div class="row mb-3">
+                <div class="col-1"><span onclick="openNav()"><h3><i class="bi bi-list"></i></h3></span></div>
+              <div class="col-10 text-center"><h3>Settings</h3></div>
+          </div>
+        </div>
+        <div class="container-fluid card col-md-4 mt-3 p-3 pb-5" style="border-top-left-radius: 25px;border-top-right-radius: 25px;">
+            <div class="row text-center">
+               <i class="fas fa-user-circle fa-5x"></i>
+               <h5 style="margin-bottom: unset;"><%= readerName.split(" ")[0] %></h5>
+               <span style="font-size:small;">Meter Reader</span>
+               
+            </div> 
+            <div class="row mt-5">
+                <div class="col-2">
+                    <span class="fa-stack" style="vertical-align: top;">
+                        <i class="fas fa-circle fa-stack-2x" style="color: #FECE2F;"></i>
+                        <i class="fas fa-unlock fa-stack-1x"></i>
+                      </span>  
+                </div>
+                <div class="col-8">
+                    <a href="/meter_reader/change_password" class="text-decoration-none link"><h6 style="margin-top: 6px;">Change Password</h6></a>
+                </div>
+                <div class="col-1">
+                    <a href="/meter_reader/change_password" class="text-decoration-none link"><h6 style="margin-top: 6px;"><i class="fas fa-chevron-right"></i></h6></i></a>
+                </div>    
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-2">
+                    <span class="fa-stack" style="vertical-align: top;">
+                        <i class="fas fa-circle fa-stack-2x" style="color: #FECE2F;"></i>
+                        <i class="fas fa-language fa-stack-1x"></i>
+                      </span>  
+                </div>
+                <div class="col-8">
+                    <a href="" class="text-decoration-none link"><h6 style="margin-top: 6px;">Language</h6></a>
+                </div>
+                <div class="col-1">
+                    <a href="" class="text-decoration-none link"><h6 style="margin-top: 6px;"><i class="fas fa-chevron-right"></i></h6></i></a>
+                </div>    
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-2">
+                    <span class="fa-stack" style="vertical-align: top;">
+                        <i class="fas fa-circle fa-stack-2x" style="color: #FECE2F;"></i>
+                        <i class="fas fa-headset fa-stack-1x"></i>
+                      </span>  
+                </div>
+                <div class="col-8">
+                    <a href="" class="text-decoration-none link"><h6 style="margin-top: 6px;">Help Center</h6></a>
+                </div>
+                <div class="col-1">
+                    <a href="" class="text-decoration-none link"><h6 style="margin-top: 6px;"><i class="fas fa-chevron-right"></i></h6></i></a>
+                </div>    
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-2">
+                    <span class="fa-stack" style="vertical-align: top;">
+                        <i class="fas fa-circle fa-stack-2x" style="color: #FECE2F;"></i>
+                        <i class="fas fa-question fa-stack-1x"></i>
+                      </span>  
+                </div>
+                <div class="col-8">
+                    <a href="" class="text-decoration-none link"><h6 style="margin-top: 6px;">About</h6></a>
+                </div>
+                <div class="col-1">
+                    <a href="" class="text-decoration-none link"><h6 style="margin-top: 6px;"><i class="fas fa-chevron-right"></i></h6></i></a>
+                </div>    
+            </div>
+        </div>
+        <%- include('../partials/footer.ejs') %>
+    </body>
+
+</html>

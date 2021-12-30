@@ -1,0 +1,104 @@
+<%- include('../partials/header_admin.ejs') %>  
+<body>
+    <div class="container">
+        <%- include('../partials/admin_nav.ejs') %>  
+        <!--main-->
+        <div class="main">
+            <div class="topbar">
+                <div class="toggle">
+                    <i class="fal fa-bars"></i> 
+                 </div>
+                <!--search-->
+                <form action="/admin/search_meter_readers" method="get">
+                    <%- include('../partials/admin_search.ejs') %>
+                </form>  
+                <!--User Image-->
+                <div class="user">
+                    <img src="user.jpg">
+                </div>
+            </div>
+            <!--cards-->
+            <a href="/admin/meter_readers" class="card-link">
+             <div class="cardBox">
+                 <div class="card">
+                     <div>
+                         <div class="cardName">All</div>
+                     </div>
+                     <div class="iconBx">
+                        <i class="fas fa-users"></i>
+                    </div>
+                 </div>
+             </div>
+            </a>
+             <!--Details list-->
+             <div class="details">
+                 <div class="recentDetails">
+                     <div class="cardHeader">
+                     <h3><% if(typeof heading !="undefined" && heading) {%> <%= heading %><% } %></h3>
+                     <a href="#" class="btn">Add a new Meter Reader</a>
+                     </div>
+                     <table>
+                         <thead>
+                            <tr>
+                                <td>#</td>
+                                <td>Reader ID</td>
+                                <td>Reader Name</td>
+                                <td>Area ID</td>
+                                <td>Area Office</td>
+                                <td>Contact No</td>
+                                <td>    </td>
+
+                            </tr>  
+                         </thead>
+                         <tbody>
+                            <% if(typeof Data !='undefined' && Data.length!=0){ var i=1; Data.forEach(function(data){ %>
+                            <tr>
+                                <td><%= i %></td>
+                                <td><%=data.reader_id%></td>
+                                <td><%=data.name%></td>
+                                <td><%=data.area_id%></td>
+                                <td><%=data.area_name%></td>
+                                <td><%=data.contact_no%></td>
+                                <td class="text-center">
+                                    <a href="/admin/view_reader/<%=data.reader_id%>"><span class="status delivered1"><i class="far fa-eye"></i></span></a>
+                                    <a href="/admin/edit_reader/<%=data.reader_id%>"><span class="status delivered2"><i class="far fa-edit"></i></span></a>
+                                    <a href="/admin/delete_reader/<%=data.reader_id%>"><span class="status delivered3"><i class="far fa-times-circle"></i></span></a>
+                                </td>
+                                
+                            </tr>
+                            <% i++; }) %>
+                            <% } else{ %>
+                                <tr>
+                                    <td colspan="7">No Data Found</td>
+                                </tr>
+                                <% } %> 
+                         </tbody>
+                     </table>
+                </div>
+             </div>
+
+        </div>
+    </div> 
+    <script>
+        //MenuToggle
+        let toggle=document.querySelector('.toggle');
+        let navigation=document.querySelector(' .navigation');
+        let main=document.querySelector('.main');
+
+        toggle.onclick=function(){
+            navigation.classList.toggle('active');
+            main.classList.toggle('active');          
+        }
+        //add hovered class in selected liste item 
+
+        let list=document.querySelectorAll('.navigation li');
+        function activeLink(){
+            list.forEach((item)=>
+            item.classList.remove('hovered'));
+            this.classList.add('hovered');
+        } 
+        list.forEach((item)=>
+        item.addEventListener('mouseover',activeLink));
+    </script>
+</body>
+</html>

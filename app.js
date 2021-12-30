@@ -66,6 +66,7 @@ db.start.connect((error)=>{
         console.log(error)
     }
 })
+//EJS view engine
 app.set('view engine','ejs');
 app.locals.moment = require('moment');
 
@@ -78,14 +79,19 @@ app.use(express.urlencoded({extended: false}));
 
 //parse JSON bodies (as sent by API clients)
 app.use(express.json());
-
 app.use(cookieParser());
 
 //routes
-app.use('/',require('./routes/user_pages'));
+app.use('/',require('./routes/customer_pages'));
 app.use('/admin',require('./routes/admin_pages'));
-app.use('/user_auth',require('./routes/user_auth'));
+app.use('/meter_reader',require('./routes/meter_reader_pages'));
+app.use('/area_office',require('./routes/area_office_pages'));
+
+//auth routes
+app.use('/customer_auth',require('./routes/customer_auth'));
 app.use('/admin/admin_auth',require('./routes/admin_auth'));
+app.use('/meter_reader/meter_reader_auth',require('./routes/meter_reader_auth'));
+app.use('/area_office/area_office_auth',require('./routes/area_office_auth'));
 
 //public dir
 const publicDir = path.join(__dirname,'./public');

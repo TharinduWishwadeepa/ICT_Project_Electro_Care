@@ -1,13 +1,146 @@
-<!DOCTYPE html>
-<html lang="en">
-    <%- include('../partials/header.ejs') %>
+<%- include('../partials/header_admin.ejs') %> 
 <body>
-    
-    <h1>Admin </h1>
-    <a href="/admin/admin_auth/logout">Logout</a>
-    
-    <a href="/admin/customers">Customers</a>
-    <a href="/admin/pricings">Pricings</a>
-    <%- include('../partials/footer.ejs') %>
+    <div class="container">
+        <%- include('../partials/admin_nav.ejs') %>  
+        <!--main-->
+        <div class="main">
+            <div class="topbar">
+                <div class="toggle">
+                    <i class="fal fa-bars"></i> 
+                 </div>
+                <!--search-->
+                <form action="/admin/search_customers" method="get">
+                    <%- include('../partials/admin_search.ejs') %>
+            </form>
+                <!--User Image-->
+                <div class="user">
+                    <img src="user.jpg">
+                </div>
+            </div> 
+            <!--cards-->
+             <div class="cardBox">
+                <a href="/admin" class="card-link">
+                 <div class="card">
+                     <div>
+                         <div class="cardName">All</div>
+                     </div>
+                     <div class="iconBx">
+                        <i class="fas fa-users"></i>
+                    </div>
+                 </div>
+                 </a>
+                 <a href="/admin/registered" class="card-link">
+                 <div class="card">
+                    <div>
+                        <div class="cardName">Registered</div>
+                    </div>
+                    <div class="iconBx">
+                        <i class="far fa-registered"></i>
+                    </div>
+                </div>
+                </a>
+                <a href="/admin/unregistered" class="card-link">
+                <div class="card">
+                    <div>
+                        <div class="cardName">Unregistered</div>
+                    </div>
+                    <div class="iconBx">
+                        <i class="fas fa-user-times"></i>
+                    </div>
+                </div>
+            </a>
+                <div class="card">
+                    <div>
+                        <div class="cardName">Reading Uploaded</div>
+                    </div>
+                    <div class="iconBx">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                </div> 
+             </div>
+             <!--Details list-->
+             <div class="details">
+                 <div class="recentDetails">
+                     <div class="cardHeader">
+                     <h3><% if(typeof heading !="undefined" && heading) {%><%= heading %><% } %> </h3>
+                     <a href="/admin/add_customer" class="btn">Add a new Customer</a>
+                     </div>
+                     <table>
+                         <thead>
+                             <tr>
+                                <td>#</td>
+                                <th>Account No.</th>
+                                <th>Name</th>
+                                <th>Mobile No.</th>
+                                <th>Current Reading</th>
+                                <th>Balance</th>
+                                <th>Account Status</th>
+                                <td></td>
+
+                             </tr>   
+                         </thead>
+                         <tbody>
+                            <% if(typeof customersData !='undefined' && customersData.length!=0){ var i=1; customersData.forEach(function(data){ %>
+                                <tr>
+                                    <td><%= i %> </td> 
+                                    <td>
+                                        <%=data.account_no %>
+                                    </td>
+                                    <td>
+                                        <%=data.name %>
+                                    </td>
+                                    <td>
+                                        <%=data.mobile_no %>
+                                    </td>
+                                    <td>
+                                        <%=data.current_reading %>
+                                    </td>
+                                    <td>
+                                        <%=data.balance %>
+                                    </td>
+                                    <td>
+                                        status
+                                    </td>
+                                    <td class="text-center">
+                                    <a href="/admin/viewcustomer/<%=data.account_no%>"><span class="status delivered1"><i class="far fa-eye"></i></span></a>
+                                    <a href="/admin/editcustomer/<%=data.account_no%>"><span class="status delivered2"><i class="far fa-edit"></i></span></a>
+                                    <a href="/admin/deletecustomer/<%=data.account_no%>"><span class="status delivered3"><i class="far fa-times-circle"></i></span></a>
+                                    </td>
+                                </tr>
+                                <% i++; }) %>
+                                    <% } else{ %>
+                                        <tr>
+                                            <td colspan="7" style="text-align: center;">No Data Found</td>
+                                        </tr>
+                                    <% } %>
+                         </tbody>
+                     </table>
+                </div>
+             </div>
+
+        </div>
+    </div>
+   
+    <script>
+        //MenuToggle
+        let toggle=document.querySelector('.toggle');
+        let navigation=document.querySelector(' .navigation');
+        let main=document.querySelector('.main');
+
+        toggle.onclick=function(){
+            navigation.classList.toggle('active');
+            main.classList.toggle('active');          
+        }
+        //add hovered class in selected liste item 
+
+        let list=document.querySelectorAll('.navigation li');
+        function activeLink(){
+            list.forEach((item)=>
+            item.classList.remove('hovered'));
+            this.classList.add('hovered');
+        } 
+        list.forEach((item)=>
+        item.addEventListener('mouseover',activeLink));
+    </script>
 </body>
 </html>

@@ -57,3 +57,14 @@
   background-color: #3b3b3b !important;
   border-color: #3b3b3b !important;
 }
+.btn-primary{
+  color: #3b3b3b !important;
+  background-color:  #fece2f!important;
+  border-color: #fece2f !important;
+  font-weight: 700;
+}
+
+.link{
+  text-decoration: none;
+  color: black!important;
+}

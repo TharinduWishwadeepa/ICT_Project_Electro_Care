@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('./partials/header.ejs') %>
+
+    <body style="background-color: #FECE2F;">
+        <div id="mySidenav" class="sidenav">
+            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+            <a href="/"><i class="bi bi-house-door-fill"></i> Home</a>
+            <a href="/upload_image"><i class="bi bi-arrow-up-circle"></i> Submit Reading</a>
+            <a href="/bill_history"><i class="fas fa-history"></i> Bill History</a>
+            <a href="/complaints"><i class="fas fa-exclamation-circle"></i> Complaints</a>
+            <a href="/view_maintenances"><i class="fas fa-calendar-times"></i> Maintanance Calender</a>
+            <hr>
+            <a href="/notifications"><i class="bi bi-bell-fill"></i> Notifications</a>
+            <a href="/settings"><i class="fas fa-cog"></i> Settings</a>
+            <hr>
+            <a href="/customer_auth/logout"><i class="bi bi-power"></i> Logout</a>
+          </div>
+
+        <div class="container-fluid col-md-4 mt-3" >
+            <div class="row mb-3">
+                <div class="col-1"><span onclick="openNav()"><h3><i class="bi bi-list"></i></h3></span></div>
+              <div class="col-10 text-center"><h3>Settings</h3></div>
+          </div>
+        </div>
+        <div class="container-fluid card col-md-4 mt-3 p-3 pb-5" style="border-top-left-radius: 25px;border-top-right-radius: 25px;">
+            <div class="row text-center">
+               <i class="fas fa-user-circle fa-5x"></i>
+               <h5 style="margin-bottom: unset;"><%= customerName.split(" ")[0] %></h5>
+               <span style="font-size:small;">Acc No. <%= account_no %></span>
+               <div class="pt-3 pb-3">
+                <a href="/edit_user" type="button" class="btn btn-primary rounded-pill"><span class="ms-3 me-3">Edit Profile&ensp;<i class="fas fa-chevron-right"></i></span></a>
+               </div>
+            </div> 
+            <div class="row mt-4">
+                <div class="col-2">
+                    <span class="fa-stack" style="vertical-align: top;">
+                        <i class="fas fa-circle fa-stack-2x" style="color: #FECE2F;"></i>
+                        <i class="fas fa-unlock fa-stack-1x"></i>
+                      </span>  
+                </div>
+                <div class="col-8">
+                    <a href="/change_password" class="text-decoration-none link"><h6 style="margin-top: 6px;">Change Password</h6></a>
+                </div>
+                <div class="col-1">
+                    <a href="/change_password" class="text-decoration-none link"><h6 style="margin-top: 6px;"><i class="fas fa-chevron-right"></i></h6></i></a>
+                </div>    
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-2">
+                    <span class="fa-stack" style="vertical-align: top;">
+                        <i class="fas fa-circle fa-stack-2x" style="color: #FECE2F;"></i>
+                        <i class="fas fa-credit-card fa-stack-1x"></i>
+                      </span>  
+                </div>
+                <div class="col-8">
+                    <a href="" class="text-decoration-none link"><h6 style="margin-top: 6px;">Payment Method</h6></a>
+                </div>
+                <div class="col-1">
+                    <a href="" class="text-decoration-none link"><h6 style="margin-top: 6px;"><i class="fas fa-chevron-right"></i></h6></i></a>
+                </div>    
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-2">
+                    <span class="fa-stack" style="vertical-align: top;">
+                        <i class="fas fa-circle fa-stack-2x" style="color: #FECE2F;"></i>
+                        <i class="fas fa-language fa-stack-1x"></i>
+                      </span>  
+                </div>
+                <div class="col-8">
+                    <a href="" class="text-decoration-none link"><h6 style="margin-top: 6px;">Language</h6></a>
+                </div>
+                <div class="col-1">
+                    <a href="" class="text-decoration-none link"><h6 style="margin-top: 6px;"><i class="fas fa-chevron-right"></i></h6></i></a>
+                </div>    
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-2">
+                    <span class="fa-stack" style="vertical-align: top;">
+                        <i class="fas fa-circle fa-stack-2x" style="color: #FECE2F;"></i>
+                        <i class="fas fa-headset fa-stack-1x"></i>
+                      </span>  
+                </div>
+                <div class="col-8">
+                    <a href="" class="text-decoration-none link"><h6 style="margin-top: 6px;">Help Center</h6></a>
+                </div>
+                <div class="col-1">
+                    <a href="" class="text-decoration-none link"><h6 style="margin-top: 6px;"><i class="fas fa-chevron-right"></i></h6></i></a>
+                </div>    
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-2">
+                    <span class="fa-stack" style="vertical-align: top;">
+                        <i class="fas fa-circle fa-stack-2x" style="color: #FECE2F;"></i>
+                        <i class="fas fa-question fa-stack-1x"></i>
+                      </span>  
+                </div>
+                <div class="col-8">
+                    <a href="" class="text-decoration-none link"><h6 style="margin-top: 6px;">About</h6></a>
+                </div>
+                <div class="col-1">
+                    <a href="" class="text-decoration-none link"><h6 style="margin-top: 6px;"><i class="fas fa-chevron-right"></i></h6></i></a>
+                </div>    
+            </div>
+        </div>
+        <%- include('./partials/footer.ejs') %>
+    </body>
+
+</html>
