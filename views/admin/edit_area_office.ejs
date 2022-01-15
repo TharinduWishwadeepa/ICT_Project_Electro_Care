@@ -1,0 +1,165 @@
+<%- include('../partials/header_admin.ejs') %>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+<style>
+  ol, ul {
+  padding-left: 0rem!important;
+}
+</style>
+    <body>
+        <div class="">
+            <%- include('../partials/admin_nav.ejs') %>
+                <!--main-->
+                <div class="main">
+                    <div class="topbar" style="padding-top: 30px;">
+                        <div class="toggle">
+                            <i class="fal fa-bars"></i>
+                        </div>
+                        <!--search-->
+                        <h3>Edit Area Office</h3>
+                        <!--User Image-->
+                        <div class="user">
+                            
+                        </div>
+                    </div>
+                    <!--Details list-->
+                    <div class="details2">
+                        <div class="recentDetails2">
+                            <div class="container mt-3 col-md-10">
+                                
+                                <form action="/admin/update_area_office" method="POST">
+                                    <div class="mb-3 form-floating">
+                                        <input type="text" class="form-control" placeholder="Area ID" name="area_id" readonly value="<% if(Data[0].area_id != "undefined" && Data[0].area_id) {%><%= Data[0].area_id %><% } %>">
+                                        <label for="floatingInput">Area ID</label>
+                                      </div>
+                                      <div class="mb-3 form-floating">
+                                        <input type="text" class="form-control" placeholder="Area Name" name="area_name" required value="<% if(Data[0].area_name != "undefined" && Data[0].area_name) {%><%= Data[0].area_name %><% } %>">
+                                        <label for="floatingInput">Area Name</label>
+                                      </div>
+                                      
+                                      <div class="mb-3 form-floating">
+                                        <textarea class="form-control" placeholder="Address" name="address" style="height: 100px" required ><% if(Data[0].address != "undefined" && Data[0].address) {%><%= Data[0].address %><% } %></textarea>
+                                        <label for="floatingInput">Address</label>
+                                      </div>
+                                      <div class="mb-3 form-floating">
+                                        <input type="tel" class="form-control" placeholder="Telephone No" name="telephone_no" required value="<% if(Data[0].telephone_no != "undefined" && Data[0].telephone_no) {%><%= Data[0].telephone_no %><% } %>">
+                                        <label for="floatingInput">Telephone No</label>
+                                      </div>
+                        
+                                      <div class="form-floating mb-3">
+                                        <select class="form-control" name="district" placeholder="Select District...">
+                                       
+                                        <option value="<% if(Data[0].district != "undefined" && Data[0].district) {%><%= Data[0].district %><% } %>" selected><% if(Data[0].district != "undefined" && Data[0].district) {%><%= Data[0].district %><% } %></option>
+                                          <option value="Ampara">Ampara</option>
+                                          <option value="Anuradhapura">Anuradhapura</option>
+                                          <option value="Badulla">Badulla</option>
+                                          <option value="Batticaloa">Batticaloa</option>
+                                          <option value="Colombo">Colombo</option>
+                                          <option value="Galle">Galle</option>
+                                          <option value="Gampaha">Gampaha</option>
+                                          <option value="Hambantota">Hambantota</option>
+                                          <option value="Jaffna">Jaffna</option>
+                                          <option value="Kalutara">Kalutara</option>
+                                          <option value="Kandy">Kandy</option>
+                                          <option value="Kegalle">Kegalle</option>
+                                          <option value="Kilinochchi">Kilinochchi</option>
+                                          <option value="Kurunegala">Kurunegala</option>          
+                                          <option value="Mannar">Mannar</option>
+                                          <option value="Matale">Matale</option>
+                                          <option value="Matara">Matara</option>
+                                          <option value="Monaragala">Monaragala</option>
+                                          <option value="Mullaitivu">Mullaitivu</option>
+                                          <option value="Nuwara Eliya">Nuwara Eliya</option>
+                                          <option value="Polonnaruwa">Polonnaruwa</option>
+                                          <option value="Puttalam">Puttalam</option>
+                                          <option value="Ratnapura">Ratnapura</option>
+                                          <option value="Trincomalee">Trincomalee</option>
+                                          <option value="Vavuniya">Vavuniya</option>     
+                                          </select>
+                                        <label for="floatingSelect">Select the District.</label>
+                                      </div>
+                        
+                                      <div class="form-floating mb-3">
+                                        <select class="form-control" name="province">
+                                        
+                                        <option value="<% if(Data[0].province != "undefined" && Data[0].province) {%><%= Data[0].province %><% } %>" selected><% if(Data[0].province != "undefined" && Data[0].province) {%><%= Data[0].province %><% } %></option>
+                                          <option value="Central">Central</option>
+                                          <option value="Eastern">Eastern</option>
+                                          <option value="North Central">North Central</option>
+                                          <option value="Northern">Northern</option>
+                                          <option value="North Western">North Western</option>
+                                          <option value="Sabaragamuwa">Sabaragamuwa</option>
+                                          <option value="Southern">Southern</option>
+                                          <option value="Uva">Uva</option>
+                                          <option value="Western">Western</option>
+                                        </option>
+                                        </select>
+                                        <label for="floatingSelect">Select the Province. Type to search...</label>
+                                      </div>
+                                      <div>
+                                        <% if (typeof messageWarning !="undefined" && messageWarning) { %>
+                                          <div class="alert alert-danger" role="alert">
+                                            <%= messageWarning %>
+                                          </div>
+                                          <% } %>
+                                            <% if (typeof message !="undefined" && message) { %>
+                                              <div class="alert alert-success" role="alert">
+                                                <%= message %>
+                                              </div>
+                                              <% } %>
+                              
+                                      </div>
+                                      
+                                      <div class="col-6 mx-auto d-grid mt-5 pb-4">
+                                        <button type="submit" class="btn btn-primary">Update</button>
+                                      </div>
+                                </form>
+                                <div class="pt-3"></div>
+                                <hr>
+                                <h5 class="pt-3">Change Password</h5>
+                                <form action="/admin/update_pw_area_office" method="post">
+                                  <input type="hidden" name="area_id" value="<% if(Data[0].area_id != "undefined" && Data[0].area_id) {%><%= Data[0].area_id %><% } %>">
+                                    <div class="mb-3 form-floating">
+                                        <input type="password" class="form-control" placeholder="Password" name="password">
+                                        <label for="floatingInput">Password</label>
+                                      </div>
+                                      <div class="mb-3 form-floating">
+                                        <input type="password" class="form-control" placeholder="Confirm Password" name="conf_password">
+                                        <label for="floatingInput">Confirm Password</label>
+                                      </div>
+                                      <div class="col-6 mx-auto d-grid mt-5 pb-4">
+                                        <button type="submit" class="btn btn-primary">Change Password</button>
+                                      </div>
+                                </form>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+        </div>
+
+        <script>
+            //MenuToggle
+            let toggle = document.querySelector('.toggle');
+            let navigation = document.querySelector(' .navigation');
+            let main = document.querySelector('.main');
+
+            toggle.onclick = function () {
+                navigation.classList.toggle('active');
+                main.classList.toggle('active');
+            }
+            //add hovered class in selected liste item 
+
+            let list = document.querySelectorAll('.navigation li');
+            function activeLink() {
+                list.forEach((item) =>
+                    item.classList.remove('hovered'));
+                this.classList.add('hovered');
+            }
+            list.forEach((item) =>
+                item.addEventListener('mouseover', activeLink));
+        </script>
+    </body>
+
+    </html>

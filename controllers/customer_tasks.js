@@ -216,7 +216,7 @@ exports.viewComplain = (req, res) => {
   try {
     let account_no = this.getAccountNo(req, res);
     db.start.query(
-      "SELECT * FROM complain WHERE status = 'pending' AND account_no = ? ORDER BY datetime DESC ",
+      "SELECT * FROM complain WHERE account_no = ? ORDER BY datetime DESC ",
       [account_no],
       (error, results) => {
         if (!error) {
@@ -327,104 +327,161 @@ exports.getOCR = (urlimg, callback) => {
   });
 };
 
-//upload image and get OCR result, analyze the reading before confirm
-exports.uploadImage = (req, res, next) => {
+//barcode scan and upload reading
+exports.confirmMeter = (req,res)=>{ 
+  let account_no = this.getAccountNo(req, res);
   var file;
   if (!req.files) {
     console.log("File was not found");
   }
-
   file = req.files.photo; //get the image from form
-  var url;
+  
   cloudinary.uploader.upload(file.tempFilePath, (error, results) => {
     //upload the image
     if (!error) {
-      url = results.secure_url; // get URL of uploaded image
-
-      this.getOCR(url, (err, body) => {
-        //send URL to Nanonets OCR API
-        if (err) {
-          console.log(error);
-        } else {
-          let resultObj = JSON.parse(body); //get the JSON Result of OCR
-
-          if (!resultObj.result) {
-            // if there is no result
-            res.render("upload_image", {
-              alert:"error",
-              alertTitle:"Ooops !",
-              title: "Upload Meter Reading",
-              text:"Cannot get the Reading. Please Try Again !",
-              link:"/upload_image",
-              buttonType:"btn-secondary",
-              buttonTxt:"Try Again"
-            });
-          } else {
-            // if there is a result
-            let meterReading = resultObj.result[0].prediction[0].ocr_text; //get original result
-            let account_no = this.getAccountNo(req, res); //get account_no
-            let current_reading;
-            let balance;
-            this.getCustomerData(account_no, (error, results) => {
-              if (error) {
-                console.log(error);
-              } else {
-                current_reading = results[0].current_reading; //get current reading
-                balance = results[0].balance; // get balance
-                customername = results[0].name; //get name
+      let url = results.secure_url; // get URL of uploaded image
+      try {
+        var Quagga = require('quagga').default;
+        Quagga.decodeSingle({
+            src: url,
+            numOfWorkers: 0,  // Needs to be 0 when used within node
+            inputStream: {   
+            },
+            decoder: {
+                readers: ["code_128_reader"] // List of active readers
+            },
+        }, function(result) {
+            if(result.codeResult) {
+              let acc_formatted = result.codeResult.code.slice(3, 13);
+              if(acc_formatted == account_no){
+                //if the meter is correct
+                res.render("upload_image", {
+                  alertType:"info",
+                  alertTitle:"Info !",
+                  url:results.secure_url,
+                  title: "Upload Meter Reading",
+                  text:"Your Account No is Correct!",
+                });
               }
-            });
-            meterReadingFormatted = meterReading.slice(0, 5); // get 1st 5 digits from meterReading
-            //if the reading length is less than 5
-            if (meterReading.length < 5) {
-              res.render("upload_image", {
-                alert:"error",
-                alertTitle:"Ooops !",
-                title: "Upload Meter Reading",
-                text:"Invalid Meter Reading. Please Try Again !",
-                link:"/upload_image",
-                buttonType:"btn-secondary",
-                buttonTxt:"Try Again",
-                title: "Upload Meter Reading",
-              });
-            }
-            //if meter reading is less than current_reading
-            else if (meterReadingFormatted <= current_reading) {
-              res.render("upload_image", {
-                alert:"error",
-                alertTitle:"Ooops !",
-                title: "Upload Meter Reading",
-                text:"Invalid Meter Reading. Please Try Again !",
-                link:"/upload_image",
-                buttonType:"btn-secondary",
-                buttonTxt:"Try Again",
-                title: "Upload Meter Reading",
-              });
+              else{
+                //if the meter is fake
+                res.render("upload_image", {
+                  alert:"error",
+                  alertTitle:"Ooops !",
+                  title: "Upload Meter Reading",
+                  text:"Invalid Electricity Meter !",
+                  link:"/upload_image",
+                  buttonType:"btn-secondary",
+                  buttonTxt:"Try Again"
+                });
+              }  
             } else {
-              //if no problem with the reading
-              this.getCustomerData(account_no, (error, results) => {
-                if (!error) {
-                  let tariff = results[0].tariff;
-                  res.render("confirm_reading", {
-                    meterReadingFormatted,
-                    tariff,
-                    current_reading,
-                    account_no,
-                    balance,
-                    url,
-                    customername,
-                    title: "Confirm Meter Reading",
-                  });
-                }
+              //if barcode read fails
+              res.render("upload_image", {
+                alert:"error",
+                alertTitle:"Ooops !",
+                title: "Upload Meter Reading",
+                text:"Electricity Meter Not Detected!",
+                link:"/upload_image",
+                buttonType:"btn-secondary",
+                buttonTxt:"Try Again"
               });
             }
-          }
-        }
-      });
+        });
+      } catch (error) {
+        console.log(error)
+      }  
     } else {
       console.log(error);
     }
   });
+  
+}
+
+//get OCR result, analyze the reading before confirm
+exports.uploadImage = (req, res, next) => {
+  var url = req.body.url;
+  this.getOCR(url, (err, body) => {
+    //send URL to Nanonets OCR API
+    if (err) {
+      console.log(error);
+    } else {
+      let resultObj = JSON.parse(body); //get the JSON Result of OCR
+
+      if (!resultObj.result) {
+        // if there is no result
+        res.render("upload_image", {
+          alert:"error",
+          alertTitle:"Ooops !",
+          title: "Upload Meter Reading",
+          text:"Cannot get the Reading. Please Try Again !",
+          link:"/upload_image",
+          buttonType:"btn-secondary",
+          buttonTxt:"Try Again"
+        });
+      } else {
+        // if there is a result
+        let meterReading = resultObj.result[0].prediction[0].ocr_text; //get original result
+        let account_no = this.getAccountNo(req, res); //get account_no
+        let current_reading;
+        let balance;
+        this.getCustomerData(account_no, (error, results) => {
+          if (error) {
+            console.log(error);
+          } else {
+            current_reading = results[0].current_reading; //get current reading
+            balance = results[0].balance; // get balance
+            customername = results[0].name; //get name
+          }
+        });
+        meterReadingFormatted = meterReading.slice(0, 5); // get 1st 5 digits from meterReading
+        //if the reading length is less than 5
+        if (meterReading.length < 5) {
+          res.render("upload_image", {
+            alert:"error",
+            alertTitle:"Ooops !",
+            title: "Upload Meter Reading",
+            text:"Invalid Meter Reading. Please Try Again !",
+            link:"/upload_image",
+            buttonType:"btn-secondary",
+            buttonTxt:"Try Again",
+            title: "Upload Meter Reading",
+          });
+        }
+        //if meter reading is less than current_reading
+        else if (meterReadingFormatted <= current_reading) {
+          res.render("upload_image", {
+            alert:"error",
+            alertTitle:"Ooops !",
+            title: "Upload Meter Reading",
+            text:"Invalid Meter Reading. Please Try Again !",
+            link:"/upload_image",
+            buttonType:"btn-secondary",
+            buttonTxt:"Try Again",
+            title: "Upload Meter Reading",
+          });
+        } else {
+          //if no problem with the reading
+          this.getCustomerData(account_no, (error, results) => {
+            if (!error) {
+              let tariff = results[0].tariff;
+              res.render("confirm_reading", {
+                meterReadingFormatted,
+                tariff,
+                current_reading,
+                account_no,
+                balance,
+                url,
+                customername,
+                title: "Confirm Meter Reading",
+              });
+            }
+          });
+        }
+      }
+    }
+  });
+  
 };
 
 //check if there is a bill for current month
@@ -505,29 +562,48 @@ exports.generateBill = (req, res) => {
           let b1_30 = results[0].b1_30;
           let b31_60 = results[0].b31_60;
           let b61_90 = results[0].b61_90;
-          let b91_105 = results[0].b91_105;
+          let b91_120 = results[0].b91_120;
+          let b121_180 = results[0].b121_180;
+          let more_180 = results[0].more_180;
           let fixed_price = results[0].fixed_price;
 
           let no_of_units = meter_reading - current_reading;
           let total;
+          //1-30
           if (no_of_units > 0 && no_of_units < 31) {
             total = b1_30 * no_of_units;
-          } else if (no_of_units > 31 && no_of_units < 61) {
+          } 
+          //31-60
+          else if (no_of_units > 30 && no_of_units < 61) {
             let remainder = no_of_units - 30;
             total = b1_30 * 30 + b31_60 * remainder;
-          } else if (no_of_units > 61 && no_of_units < 91) {
+          } 
+          //61-90
+          else if (no_of_units > 60 && no_of_units < 91) {
             let remainder = no_of_units - 60;
             total = b1_30 * 30 + b31_60 * 30 + b61_90 * remainder;
-          } else if (no_of_units > 91 && no_of_units < 106) {
-            let remainder = no_of_units - 90;
-            total =
-              b1_30 * 30 + b31_60 * 30 + b61_90 * 30 + b91_105 * remainder;
+          } 
+          //91-120
+          else if (no_of_units > 91 && no_of_units < 121) {
+            let remainder = no_of_units - 90;  
+            total = b1_30 * 30 + b31_60 * 30 + b61_90 * 30 + b91_120 * remainder;
           }
+          //121-180
+          else if (no_of_units > 120 && no_of_units < 181) {
+            let remainder = no_of_units - 120;  
+            total = b1_30 * 30 + b31_60 * 30 + b61_90 * 30 + b91_120 * 30 + b121_180 * remainder;
+          }
+          //more than 180
+          else if (no_of_units > 180) {
+            let remainder = no_of_units - 180;  
+            total = b1_30 * 30 + b31_60 * 30 + b61_90 * 30 + b91_120 * 30 + b121_180 * 30 + more_180 * remainder;
+          }
+          
           let cost_of_usage = total + parseFloat(fixed_price);
           payableAmount = cost_of_usage + parseFloat(balance);
           //add a bill
           db.start.query(
-            "INSERT INTO bill SET ?",
+            "INSERT INTO bill SET ? ",
             [
               {
                 acc_no: account_no,
@@ -537,17 +613,17 @@ exports.generateBill = (req, res) => {
                 total_payable: payableAmount,
                 image: url,
                 markedby: "User",
-              },
+              }
             ],
             (error, results) => {
               if (!error) {
                 db.start.query(
-                  "UPDATE customer SET ?",
+                  "UPDATE customer SET ? WHERE account_no = ?",
                   [
                     {
                       balance: payableAmount,
                       current_reading: meter_reading,
-                    },
+                    },account_no
                   ],
                   (error, results) => {
                     if (!error) {

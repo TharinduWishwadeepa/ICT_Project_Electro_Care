@@ -9,17 +9,17 @@
                     <i class="fal fa-bars"></i> 
                  </div>
                 <!--search-->
-                <form action="/admin/search_customers" method="get">
+                <form action="/area_office/search_customers" method="get">
                     <%- include('../partials/admin_search.ejs') %>
             </form>
                 <!--User Image-->
-                <div class="user">
-                    <img src="user.jpg">
+                <div>
+                    
                 </div>
             </div> 
             <!--cards-->
              <div class="cardBox">
-                <a href="/admin" class="card-link">
+                <a href="/area_office" class="card-link">
                  <div class="card">
                      <div>
                          <div class="cardName">All</div>
@@ -29,7 +29,7 @@
                     </div>
                  </div>
                  </a>
-                 <a href="/admin/registered" class="card-link">
+                 <a href="/area_office/registered" class="card-link">
                  <div class="card">
                     <div>
                         <div class="cardName">Registered</div>
@@ -39,7 +39,7 @@
                     </div>
                 </div>
                 </a>
-                <a href="/admin/unregistered" class="card-link">
+                <a href="/area_office/unregistered" class="card-link">
                 <div class="card">
                     <div>
                         <div class="cardName">Unregistered</div>
@@ -49,21 +49,14 @@
                     </div>
                 </div>
             </a>
-                <div class="card">
-                    <div>
-                        <div class="cardName">Reading Uploaded</div>
-                    </div>
-                    <div class="iconBx">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                    </div>
-                </div> 
+                
              </div>
              <!--Details list-->
              <div class="details">
                  <div class="recentDetails">
                      <div class="cardHeader">
                      <h3><% if(typeof heading !="undefined" && heading) {%><%= heading %><% } %> </h3>
-                     <a href="/admin/add_customer" class="btn">Add a new Customer</a>
+                     
                      </div>
                      <table>
                          <thead>
@@ -102,9 +95,7 @@
                                         status
                                     </td>
                                     <td class="text-center">
-                                    <a href="/admin/viewcustomer/<%=data.account_no%>"><span class="status delivered1"><i class="far fa-eye"></i></span></a>
-                                    <a href="/admin/editcustomer/<%=data.account_no%>"><span class="status delivered2"><i class="far fa-edit"></i></span></a>
-                                    <a href="/admin/deletecustomer/<%=data.account_no%>"><span class="status delivered3"><i class="far fa-times-circle"></i></span></a>
+                                    <a href="/area_office/view_customer/<%=data.account_no%>"><span class="status delivered1"><i class="far fa-eye"></i></span></a>
                                     </td>
                                 </tr>
                                 <% i++; }) %>

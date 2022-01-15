@@ -1,0 +1,107 @@
+<%- include('../partials/header_admin.ejs') %>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+<style>
+  ol, ul {
+  padding-left: 0rem!important;
+}
+</style>
+    <body>
+        <div class="">
+            <%- include('../partials/admin_nav.ejs') %>
+                <!--main-->
+                <div class="main">
+                    <div class="topbar" style="padding-top: 30px;">
+                        <div class="toggle">
+                            <i class="fal fa-bars"></i>
+                        </div>
+                        <!--search-->
+                        <h3>Add Meter Reader</h3>
+                        <!--User Image-->
+                        <div class="user">
+                            
+                        </div>
+                    </div>
+                    <!--Details list-->
+                    <div class="details2">
+                        <div class="recentDetails2">
+                            <div class="container mt-3 col-md-10">
+                                
+                                <form action="/admin/add_meter_reader" method="POST">
+                                    <div class="mb-3 form-floating">
+                                        <input type="text" class="form-control" placeholder="Reader ID" name="reader_id" required >
+                                        <label for="floatingInput">Reader ID</label>
+                                      </div>
+                                      <div class="mb-3 form-floating">
+                                        <input type="text" class="form-control" placeholder="Name" name="name" required >
+                                        <label for="floatingInput">Name</label>
+                                      </div>
+                                      <div class="mb-3 form-floating">
+                                        <input type="password" class="form-control" placeholder="Password" name="password">
+                                        <label for="floatingInput">Password</label>
+                                      </div>
+                                      <div class="mb-3 form-floating">
+                                        <input type="password" class="form-control" placeholder="Confirm Password" name="conf_password">
+                                        <label for="floatingInput">Confirm Password</label>
+                                      </div>
+                                      <div class="mb-3 form-floating">
+                                        <input type="tel" class="form-control" placeholder="Contact No" name="contact_no" required >
+                                        <label for="floatingInput">Contact No</label>
+                                      </div>
+                                      <div class="mb-3 form-floating">
+                                        <select class="form-select" name="area_id">
+                                            <% if(typeof officeList !='undefined' && officeList){ var i=1; officeList.forEach(function(data){ %>
+                                                <option value="<%= data.area_id %>"><%= data.area_name %></option>
+                                                <% i++; })} %>
+                                          </select>
+                                          <label for="floatingSelect">Select Area Office</label>
+                                      </div>
+                                      <div>
+                                        <% if (typeof messageWarning !="undefined" && messageWarning) { %>
+                                          <div class="alert alert-danger" role="alert">
+                                            <%= messageWarning %>
+                                          </div>
+                                          <% } %>
+                                            <% if (typeof message !="undefined" && message) { %>
+                                              <div class="alert alert-success" role="alert">
+                                                <%= message %>
+                                              </div>
+                                              <% } %>
+                              
+                                      </div>
+                                      
+                                      <div class="col-6 mx-auto d-grid mt-5 pb-4">
+                                        <button type="submit" class="btn btn-primary">Submit</button>
+                                      </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+        </div>
+
+        <script>
+            //MenuToggle
+            let toggle = document.querySelector('.toggle');
+            let navigation = document.querySelector(' .navigation');
+            let main = document.querySelector('.main');
+
+            toggle.onclick = function () {
+                navigation.classList.toggle('active');
+                main.classList.toggle('active');
+            }
+            //add hovered class in selected liste item 
+
+            let list = document.querySelectorAll('.navigation li');
+            function activeLink() {
+                list.forEach((item) =>
+                    item.classList.remove('hovered'));
+                this.classList.add('hovered');
+            }
+            list.forEach((item) =>
+                item.addEventListener('mouseover', activeLink));
+        </script>
+    </body>
+
+    </html>

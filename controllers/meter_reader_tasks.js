@@ -277,23 +277,41 @@ exports.generateBill = (req, res) => {
           let b1_30 = results[0].b1_30;
           let b31_60 = results[0].b31_60;
           let b61_90 = results[0].b61_90;
-          let b91_105 = results[0].b91_105;
+          let b91_120 = results[0].b91_120;
+          let b121_180 = results[0].b121_180;
+          let more_180 = results[0].more_180;
           let fixed_price = results[0].fixed_price;
 
           let no_of_units = meter_reading - current_reading;
           let total;
+          //1-30
           if (no_of_units > 0 && no_of_units < 31) {
             total = b1_30 * no_of_units;
-          } else if (no_of_units > 31 && no_of_units < 61) {
+          } 
+          //31-60
+          else if (no_of_units > 30 && no_of_units < 61) {
             let remainder = no_of_units - 30;
             total = b1_30 * 30 + b31_60 * remainder;
-          } else if (no_of_units > 61 && no_of_units < 91) {
+          } 
+          //61-90
+          else if (no_of_units > 60 && no_of_units < 91) {
             let remainder = no_of_units - 60;
             total = b1_30 * 30 + b31_60 * 30 + b61_90 * remainder;
-          } else if (no_of_units > 91 && no_of_units < 106) {
-            let remainder = no_of_units - 90;
-            total =
-              b1_30 * 30 + b31_60 * 30 + b61_90 * 30 + b91_105 * remainder;
+          } 
+          //91-120
+          else if (no_of_units > 91 && no_of_units < 121) {
+            let remainder = no_of_units - 90;  
+            total = b1_30 * 30 + b31_60 * 30 + b61_90 * 30 + b91_120 * remainder;
+          }
+          //121-180
+          else if (no_of_units > 120 && no_of_units < 181) {
+            let remainder = no_of_units - 120;  
+            total = b1_30 * 30 + b31_60 * 30 + b61_90 * 30 + b91_120 * 30 + b121_180 * remainder;
+          }
+          //more than 180
+          else if (no_of_units > 180) {
+            let remainder = no_of_units - 180;  
+            total = b1_30 * 30 + b31_60 * 30 + b61_90 * 30 + b91_120 * 30 + b121_180 * 30 + more_180 * remainder;
           }
           let cost_of_usage = total + parseFloat(fixed_price);
           payableAmount = cost_of_usage + parseFloat(balance);
@@ -314,12 +332,12 @@ exports.generateBill = (req, res) => {
             (error, results) => {
               if (!error) {
                 db.start.query(
-                  "UPDATE customer SET ?",
+                  "UPDATE customer SET ? WHERE account_no = ?",
                   [
                     {
                       balance: payableAmount,
                       current_reading: meter_reading,
-                    },
+                    },account_no
                   ],
                   (error, results) => {
                     if (!error) {

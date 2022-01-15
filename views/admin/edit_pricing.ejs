@@ -24,8 +24,16 @@
                 <label for="floatingInput">61 - 90</label>
               </div>
               <div class="mb-3 form-floating">
-                <input type="number" step="0.01" class="form-control" placeholder="91- 105" name="b91_105" value="<%= results[0].b91_105 %>">
-                <label for="floatingInput">91- 105</label>
+                <input type="number" step="0.01" class="form-control" placeholder="91 - 120" name="b91_120" required >
+                <label for="floatingInput">91 - 120</label>
+              </div>
+              <div class="mb-3 form-floating">
+                <input type="number" step="0.01" class="form-control" placeholder="121 - 180" name="b121_180" required >
+                <label for="floatingInput">121 - 180</label>
+              </div>
+              <div class="mb-3 form-floating">
+                <input type="number" step="0.01" class="form-control" placeholder="More than 180" name="more_180" required >
+                <label for="floatingInput">More than 180</label>
               </div>
               <div class="mb-3 form-floating">
                 <input type="number" step="0.01" class="form-control" placeholder="Fixed Price" name="fixed_price" value="<%= results[0].fixed_price %>" required >

@@ -52,6 +52,7 @@ exports.register = (req, res) => {
   const {
     name,
     account_no,
+    nic,
     email,
     mobile_no,
     username,
@@ -59,7 +60,7 @@ exports.register = (req, res) => {
     conf_password,
   } = req.body;
 
-  if (!name || !account_no || !email || !mobile_no || !username || !password ||!conf_password) {
+  if (!name || !account_no || !nic || !email || !mobile_no || !username || !password ||!conf_password) {
     return res.status(400).render("register", {
       messageWarning: "Please provide required fields",
       title : "Customer Register",
@@ -80,8 +81,8 @@ exports.register = (req, res) => {
         });
       } else {
         db.start.query(
-          "SELECT account_no, username, password FROM customer WHERE account_no=?",
-          [account_no],
+          "SELECT account_no, username, password FROM customer WHERE account_no=? AND nic=?",
+          [account_no,nic],
           async (error, results) => {
             if (error) {
               console.log(error);

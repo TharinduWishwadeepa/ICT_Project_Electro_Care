@@ -222,6 +222,7 @@ else {
 router.post("/update_user", customerTasks.updateUser);
 router.post("/make_complain", customerTasks.makeComplain);
 router.post('/change_password', customerTasks.changePW);
+router.post('/confirm_meter',customerTasks.confirmMeter);
 router.post('/upload_image', customerTasks.uploadImage);
 router.post('/confirm_reading', customerTasks.generateBill);
 

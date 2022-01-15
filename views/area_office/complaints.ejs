@@ -1,7 +1,10 @@
 <%- include('../partials/header_admin.ejs') %> 
+<style>
+    a{text-decoration: none;}
+</style>
 <body>
     <div class="container">
-        <%- include('../partials/admin_nav.ejs') %>  >  
+        <%- include('../partials/officer_nav.ejs') %>  >  
         <!--main-->
         <div class="main">
             <div class="topbar">
@@ -16,23 +19,24 @@
                     </label>
                 </div>
                 <!--User Image-->
-                <div class="user">
-                    
+                <div>
+                   
                 </div>
             </div> 
             <!--cards-->
              <div class="cardBox">
-                 <a href="/admin/complaints">
+                 <a href="/area_office/complaints">
                  <div class="card">
                      <div>
                          <div class="numbers"><% if((typeof countAll !='undefined') && countAll) {%><%= countAll %><% } %></div>
                          <div class="cardName">All</div>
                      </div>
                      <div class="iconBx">
-                         <ion-icon name="eye-outline"></ion-icon>
+                         <ion-icon name="eye-outline"></ion-icon> 
                      </div>
                  </div>
                 </a>
+                <a href="">
                  <div class="card">
                     <div>
                         <div class="numbers"><% if((typeof countNew !='undefined') && countNew) {%><%= countNew %><% } %></div>
@@ -42,6 +46,8 @@
                         <ion-icon name="newspaper-outline"></ion-icon>
                     </div>
                 </div>
+            </a>
+                <a>
                 <div class="card">
                     <div>
                         <div class="numbers"><% if((typeof countInProgress !='undefined')) {%><%= countInProgress %><% } %></div>
@@ -51,6 +57,8 @@
                         <ion-icon name="code-outline"></ion-icon>
                     </div>
                 </div>
+            </a>
+            <a>
                 <div class="card">
                     <div>
                         <div class="numbers"><% if((typeof countCompleted !='undefined')) {%><%= countCompleted %><% } %></div>
@@ -61,11 +69,13 @@
                     </div>
                 </div> 
              </div>
+            </a>
              <!--Details list-->
              <div class="details">
                  <div class="recentDetails">
                      <div class="cardHeader">
                      <h3>Complaints</h3>
+                    
                      </div>
                      <table>
                          <thead>
@@ -88,7 +98,7 @@
                                  <td><%= data.type %></td>
                                  <td><%= data.account_no %></td>
                                  <td><%= data.status %></td>
-                                 <td><a href="/admin/view_complaint/<%= data.complain_id %>"><span class="status delivered1"><i class="far fa-eye"></i></span></a></td>
+                                 <td><a href="/area_office/view_complaint/<%= data.complain_id %>"><span class="status delivered1"><i class="far fa-eye"></i></span></a></td>
                              </tr>
                              <% i++; }) %>
                                     <% } else{ %>

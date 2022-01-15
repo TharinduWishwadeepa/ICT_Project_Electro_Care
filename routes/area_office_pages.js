@@ -29,6 +29,59 @@ router.get("/change_password", authController.isLoggedIn, (req, res) => {
   } else {
       res.redirect("/area_office");
     }
-  });
+});
 
+router.get("/maintenance", authController.isLoggedIn, (req, res) => {
+    if (req.user) {
+      res.locals.title = "Maintenance";
+      officerTasks.viewMaintenences(req,res);
+  } else {
+      res.redirect("/area_office");
+    }
+});
+
+router.get('/complaints', authController.isLoggedIn,(req,res)=>{
+    if(req.user){
+        res.locals.title = "Complaints";
+        officerTasks.viewComplaints(req,res);
+    }
+    else {
+        res.redirect('../area_office');
+    }
+});
+
+router.get('/view_complaint/:comp_id', authController.isLoggedIn,(req,res)=>{
+    if(req.user){
+        res.locals.title = "Complaint";
+        officerTasks.viewComplain(req,res);
+    }
+    else {
+        res.redirect('../area_office');
+    }
+});
+
+router.get('/registered',authController.isLoggedIn, (req, res) => {
+    if(req.user){
+        res.locals.title = "Registered Customers";
+        officerTasks.viewRegisteredCustomers(req,res);
+    }
+    else {
+        res.redirect('../area_office');
+    }
+});
+
+router.get('/unregistered',authController.isLoggedIn, (req, res) => {
+    if(req.user){
+        res.locals.title = "Unregistered Customers";
+        officerTasks.viewUnregisteredCustomer(req,res);
+    }
+    else {
+        res.redirect('../area_office');
+    }
+});
+router.get('/search_customers',officerTasks.searchCustomer);
+
+router.post('/reply_complaint',officerTasks.replyComplaint);
+router.post('/change_password',officerTasks.changePW)
+router.post('/new_maintenance',officerTasks.createMaintenance)
 module.exports = router;

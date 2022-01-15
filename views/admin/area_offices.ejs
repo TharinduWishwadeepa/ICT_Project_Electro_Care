@@ -14,12 +14,13 @@
                 </form>
                 <!--User Image-->
                 <div class="user">
-                    <img src="./user.jpg">
+                    
                 </div>
             </div> 
             <!--cards-->
-            <a href="/admin/area_offices" class="card-link">
+            
              <div class="cardBox">
+                <a href="/admin/area_offices" class="card-link">
                  <div class="card">
                      <div>
                          <div class="cardName">All</div>
@@ -27,15 +28,15 @@
                      <div class="iconBx">
                         <i class="fas fa-users"></i>
                     </div>
-                 </div>
+                 </div></a>
              </div>
-            </a>
+            
              <!--Details list-->
              <div class="details">
                  <div class="recentDetails">
                      <div class="cardHeader">
                      <h3><% if(typeof heading !="undefined" && heading) {%> <%= heading %><% } %></h3>
-                     <a href="#" class="btn">Add a new Area Officer</a>
+                     <a href="/admin/add_area_office" class="btn">Add a new Area Officer</a>
                      </div>
                      <table>
                          <thead>
@@ -62,8 +63,7 @@
                                 <td><%= data.district %></td>
                                 <td><%= data.province %></td>
                                 <td class="text-center">
-                                    <a href="/admin/viewoffice/<%=data.area_id%>"><span class="status delivered1"><i class="far fa-eye"></i></span></a>
-                                    <a href="/admin/editoffice/<%=data.area_id%>"><span class="status delivered2"><i class="far fa-edit"></i></span></a>
+                                    <a href="/admin/edit_area_office/<%=data.area_id%>"><span class="status delivered2"><i class="far fa-edit"></i></span></a>
                                     <a href="/admin/deleteoffice/<%=data.area_id%>"><span class="status delivered3"><i class="far fa-times-circle"></i></span></a>
                                 </td>
                             </tr>

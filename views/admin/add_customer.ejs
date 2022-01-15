@@ -3,7 +3,7 @@
 
     <body>
         <div class="container">
-            <%- include('../partials/officer_nav.ejs') %>
+            <%- include('../partials/admin_nav.ejs') %>
                 <!--main-->
                 <div class="main">
                     <div class="topbar" style="padding-top: 30px;">
@@ -14,7 +14,7 @@
                         <h2>Add a Customer</h2>
                         <!--User Image-->
                         <div class="user">
-                            <img src="user.jpg">
+                            
                         </div>
                     </div>
                     <!--Details list-->
@@ -31,7 +31,7 @@
                                 </div>
                                 <div class="form-input">
                                     <span><i class="fa fa-id-card" aria-hidden="true"></i></span>
-                                    <input type="text" name="" placeholder="Enter your ID/Passport No" required>
+                                    <input type="text" name="nic" placeholder="Enter your ID/Passport No" required>
                                 </div>                        
                                 <div class="form-input">
                                     <span> <i class="fa fa-map-marker" aria-hidden="true"></i></span>
@@ -47,7 +47,7 @@
                                 </div>
                                 <div class="form-input">
                                     <span><i class="fa fa-list" aria-hidden="true"></i> </span>
-                                    <select class="custom-select2">
+                                    <select class="custom-select2" name="tariff">
                                         <option value="AL">Select Tariff</option>
                                          <% if(typeof tariffList !='undefined' && tariffList){ var i=1; tariffList.forEach(function(data){ %>
                                             <option value="<%= data.tariff %>"><%= data.tariff %></option>
@@ -57,7 +57,7 @@
 
                                 <div class="form-input">
                                     <span><i class="fa fa-building" aria-hidden="true"></i> </span><select
-                                        class="custom-select2">
+                                        class="custom-select2" name="area_id">
                                         <option value="AL">Select Your Area Office</option>
                                         <% if(typeof officeList !='undefined' && officeList){ var i=1; officeList.forEach(function(data){ %>
                                             <option value="<%= data.area_id %>"><%= data.area_name %></option>

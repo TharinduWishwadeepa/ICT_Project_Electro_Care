@@ -19,10 +19,10 @@
             </div>
             <div class="card shadow p-3 mb-3" style=" border-radius: 25px; background-color: #FECE2F;">
                 <div class="card-body text-center">
-                    <form action="/upload_image" method="POST" enctype="multipart/form-data">
+                    <form action="/confirm_meter" method="POST" enctype="multipart/form-data">
                         <div class="image-upload">
                             <label for="file-input">
-                              <img src="imageup.png" class="img-fluid" width="auto">
+                              <img src="./imageup.png" class="img-fluid" width="auto">
                             </label>
                             <input type="file" accept="image/*" capture="environment" name="photo" id="file-input">                           
                           </div>
@@ -34,9 +34,9 @@
                     </div>
         </div>
         </div>
-
+        <%- include('./partials/footer.ejs') %>
         <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>      
-        
+
         <% if (typeof alert != "undefined" && alert) { %>
             <script>
              const el = document.createElement('div')
@@ -51,7 +51,22 @@
                 });
            </script>
            <% } %>  
-        <%- include('./partials/footer.ejs') %>
+
+           <% if (typeof alertType != "undefined" && alertType) { %>
+            <script>
+             const el = document.createElement('div')
+                el.innerHTML = "<form method='post' action='/upload_image'><input type='hidden' name='url' value='<%= url %>'><input type='submit' value='Proceed' class='btn btn-primary rounded-pill'></form>"
+             swal({
+                title: "<%= alertTitle %>",
+                icon: "<%= alertType %>",
+                button: false,
+                text:"<%= text %>",
+                closeOnClickOutside: false,
+                content: el,
+                });
+           </script>
+           <% } %>  
+        
     </body>
 
 </html>

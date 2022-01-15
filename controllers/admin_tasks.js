@@ -1,6 +1,6 @@
 const db = require("../model/db");
 const bcrypt = require("bcryptjs");
-
+const notify = require("./notifications");
 //* Customer Management */
 //**********************/
 
@@ -9,16 +9,17 @@ exports.addCustomer = (req, res) => {
   const {
     account_no,
     name,
-    nic, 
+    nic,
     address,
     area_id,
     current_reading,
     tariff,
     balance,
   } = req.body;
-
+  console.log(req.body);
   try {
-    db.start.query("INSERT INTO customer SET ?"),
+    db.start.query(
+      "INSERT INTO customer SET ?",
       [
         {
           account_no: account_no,
@@ -39,41 +40,48 @@ exports.addCustomer = (req, res) => {
         } else {
           console.log(error);
         }
-      };
+      }
+    );
   } catch (error) {
     console.log(error);
   }
 };
 
 //pass data to add_customer page
-exports.renderAddCustomer = (req,res)=>{
+exports.renderAddCustomer = (req, res) => {
   try {
-    db.start.query("SELECT area_id, area_name from areaoffice",(error,officeList)=>{
-      if(!error){
-        db.start.query("SELECT tariff FROM pricing",(error,tariffList)=>{
-          if(!error){
-            return res.render("./admin/add_customer", {officeList, tariffList})
-          }
-          else{
-            console.log(error);
-          }
-        })
+    db.start.query(
+      "SELECT area_id, area_name from areaoffice",
+      (error, officeList) => {
+        if (!error) {
+          db.start.query("SELECT tariff FROM pricing", (error, tariffList) => {
+            if (!error) {
+              return res.render("./admin/add_customer", {
+                officeList,
+                tariffList,
+              });
+            } else {
+              console.log(error);
+            }
+          });
+        } else {
+          console.log(error);
+        }
       }
-      else{
-        console.log(error)
-      }
-    })
+    );
   } catch (error) {
     console.log(error);
   }
-}
+};
 //view all customers
 exports.viewAllCustomers = (req, res) => {
   try {
     db.start.query("SELECT * FROM customer", (error, results) => {
       if (!error) {
-        res.render("./admin", { customersData: results,
-        heading:"All Customers" });
+        res.render("./admin", {
+          customersData: results,
+          heading: "All Customers",
+        });
       } else {
         console.log(error);
       }
@@ -87,10 +95,11 @@ exports.viewAllCustomers = (req, res) => {
 exports.viewCustomer = (req, res) => {
   try {
     db.start.query(
-      "SELECT * FROM customer WHERE account_no = ?",
+      "SELECT customer.*,areaoffice.area_name FROM customer INNER JOIN areaoffice ON customer.area_id = areaoffice.area_id WHERE account_no = ?",
       [req.params.id],
       (error, results) => {
         if (!error) {
+          console.log(results);
           res.render("./admin/view_customer", { customerData: results });
         } else {
           console.log(error);
@@ -109,8 +118,10 @@ exports.viewUnregisteredCustomer = (req, res) => {
       "SELECT * FROM customer WHERE username = '' AND password = '' ",
       (error, results) => {
         if (!error) {
-          res.render("./admin", { customersData: results,
-            heading:"Unregistered Customers" });
+          res.render("./admin", {
+            customersData: results,
+            heading: "Unregistered Customers",
+          });
         } else {
           console.log(error);
         }
@@ -128,8 +139,10 @@ exports.viewRegisteredCustomers = (req, res) => {
       "SELECT * FROM customer WHERE username != '' AND password != '' ",
       (error, results) => {
         if (!error) {
-          res.render("./admin", { customersData: results,
-            heading:"Registered Customers" });
+          res.render("./admin", {
+            customersData: results,
+            heading: "Registered Customers",
+          });
         } else {
           console.log(error);
         }
@@ -149,9 +162,11 @@ exports.searchCustomer = (req, res) => {
       ["%" + searchTerm + "%", "%" + searchTerm + "%"],
       (error, results) => {
         if (!error) {
-          res.render("./admin", { customersData: results,
-            heading:`Search results: "${req.query.search}"`,
-          searchTerm:req.query.search});
+          res.render("./admin", {
+            customersData: results,
+            heading: `Search results: "${req.query.search}"`,
+            searchTerm: req.query.search,
+          });
         } else {
           console.log(error);
         }
@@ -166,12 +181,33 @@ exports.searchCustomer = (req, res) => {
 exports.editCustomer = (req, res) => {
   try {
     db.start.query(
-      "SELECT * FROM customer WHERE account_no = ?",
+      "SELECT customer.*,areaoffice.area_name FROM customer INNER JOIN areaoffice ON customer.area_id = areaoffice.area_id WHERE account_no = ?",
       [req.params.id],
       (error, results) => {
         if (!error) {
-          console.log(results);
-          res.render("./admin/edit_customer", { customerData: results });
+          db.start.query(
+            "SELECT area_id, area_name from areaoffice",
+            (error, officeList) => {
+              if (!error) {
+                db.start.query(
+                  "SELECT tariff FROM pricing",
+                  (error, tariffList) => {
+                    if (!error) {
+                      return res.render("./admin/edit_customer", {
+                        customerData: results,
+                        officeList,
+                        tariffList,
+                      });
+                    } else {
+                      console.log(error);
+                    }
+                  }
+                );
+              } else {
+                console.log(error);
+              }
+            }
+          );
         } else {
           console.log(error);
         }
@@ -195,7 +231,8 @@ exports.updateCustomer = (req, res) => {
     balance,
   } = req.body;
   try {
-    db.start.query("UPDATE customer SET ? WHERE account_no = ?"),
+    db.start.query(
+      "UPDATE customer SET ? WHERE account_no = ?",
       [
         {
           name: name,
@@ -206,24 +243,39 @@ exports.updateCustomer = (req, res) => {
           tariff: tariff,
           balance: balance,
         },
-        req.params.id,
+        account_no,
       ],
       (error, results) => {
         if (!error) {
           try {
             db.start.query(
-              "SELECT * FROM customer WHERE account_no=?",
-              [req.params.id],
+              "SELECT customer.*,areaoffice.area_name FROM customer INNER JOIN areaoffice ON customer.area_id = areaoffice.area_id WHERE account_no = ?",
+              [account_no],
               (error, results) => {
-                if (!error) {
-                  console.log(results);
-                  res.render("./admin/edit_customer", {
-                    customerData: results,
-                    message: `${account_no} has been updated!`,
-                  });
-                } else {
-                  console.log(error);
-                }
+                db.start.query(
+                  "SELECT area_id, area_name from areaoffice",
+                  (error, officeList) => {
+                    if (!error) {
+                      db.start.query(
+                        "SELECT tariff FROM pricing",
+                        (error, tariffList) => {
+                          if (!error) {
+                            res.render("./admin/edit_customer", {
+                              customerData: results,
+                              officeList,
+                              tariffList,
+                              message: `${account_no} has been updated!`,
+                            });
+                          } else {
+                            console.log(error);
+                          }
+                        }
+                      );
+                    } else {
+                      console.log(error);
+                    }
+                  }
+                );
               }
             );
           } catch (error) {
@@ -232,7 +284,8 @@ exports.updateCustomer = (req, res) => {
         } else {
           console.log(error);
         }
-      };
+      }
+    );
   } catch (error) {
     console.log(error);
   }
@@ -258,69 +311,201 @@ exports.deleteCustomer = (req, res) => {
 };
 
 //view complaints
-exports.viewComplaints = (req,res)=>{
+exports.viewComplaints = (req, res) => {
   try {
-    //WHERE complain_to = 'admin'
     //select complaint records
-    db.start.query("SELECT * FROM complain ",(error,results)=>{
-      if(!error){
-        //count of all complaints --- AND complain_to = 'admin'
-        db.start.query("SELECT COUNT(complain_id) AS countAll FROM complain",(error,countAll)=>{
-          if(!error){
-            //count of new complaints  --- AND complain_to = 'admin' 
-            db.start.query("SELECT COUNT(complain_id) AS countNew FROM complain WHERE status = 'Pending'",(error,countNew)=>{
-              if(!error){
-                //count of in progress --- AND complain_to = 'admin'
-                db.start.query("SELECT COUNT(complain_id) AS countInProgress FROM complain WHERE status = 'In Progress'",(error,countInProgress)=>{
-                  if(!error){
-                    //count of completed --- AND complain_to = 'admin'
-                    db.start.query("SELECT COUNT(complain_id) AS countCompleted FROM complain WHERE status = 'Completed'",(error,countCompleted)=>{
-                      if(!error){
-                        return res.render('./admin/complaints',{
-                          Complains: results,
-                          countAll: countAll[0].countAll,
-                          countNew: countNew[0].countNew,
-                          countInProgress: countInProgress[0].countInProgress,
-                          countCompleted: countCompleted[0].countCompleted
-                        })
-                      }
-                      else{
-                        console.log(error);
-                      }
-                    })
+    db.start.query(
+      "SELECT * FROM complain WHERE complain_to = 'admin'",
+      (error, results) => {
+        if (!error) {
+          //count of all complaints ---
+          db.start.query(
+            "SELECT COUNT(complain_id) AS countAll FROM complain WHERE complain_to = 'admin'",
+            (error, countAll) => {
+              if (!error) {
+                //count of new complaints  ---
+                db.start.query(
+                  "SELECT COUNT(complain_id) AS countNew FROM complain WHERE status = 'Pending' AND complain_to = 'admin'",
+                  (error, countNew) => {
+                    if (!error) {
+                      //count of in progress ---
+                      db.start.query(
+                        "SELECT COUNT(complain_id) AS countInProgress FROM complain WHERE status = 'In Progress' AND complain_to = 'admin'",
+                        (error, countInProgress) => {
+                          if (!error) {
+                            //count of completed ---
+                            db.start.query(
+                              "SELECT COUNT(complain_id) AS countCompleted FROM complain WHERE status = 'Completed' AND complain_to = 'admin'",
+                              (error, countCompleted) => {
+                                if (!error) {
+                                  return res.render("./admin/complaints", {
+                                    Complains: results,
+                                    countAll: countAll[0].countAll,
+                                    countNew: countNew[0].countNew,
+                                    countInProgress:
+                                      countInProgress[0].countInProgress,
+                                    countCompleted:
+                                      countCompleted[0].countCompleted,
+                                  });
+                                } else {
+                                  console.log(error);
+                                }
+                              }
+                            );
+                          } else {
+                            console.log(error);
+                          }
+                        }
+                      );
+                    } else {
+                      console.log(error);
+                    }
                   }
-                  else{
-                    console.log(error);
-                  }
-                })
-              }
-              else{
+                );
+              } else {
                 console.log(error);
               }
-            })
-          }
-          else{
-            console.log(error);
-          }
-        })  
+            }
+          );
+        } else {
+          console.log(error);
+        }
       }
-      else{
-        console.log(error);
-      }
-    })
+    );
   } catch (error) {
     console.log(error);
   }
-}
+};
+
+//get single complain
+exports.viewComplain = (req, res) => {
+  try {
+    db.start.query(
+      "SELECT * FROM complain INNER JOIN customer ON complain.account_no = customer.account_no WHERE complain_id = ?",
+      [req.params.comp_id],
+      (error, results) => {
+        if (!error) {
+          return res.render("admin/view_complaint", { results });
+        } else {
+          console.log(error);
+        }
+      }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+exports.replyComplaint = (req, res) => {
+  let { account_no, complain_id, status, reply } = req.body;
+  try {
+    db.start.query(
+      "UPDATE complain SET ? WHERE complain_id = ?",
+      [
+        {
+          status: status,
+          reply: reply,
+        },
+        complain_id,
+      ],
+      (error, results) => {
+        if (!error) {
+          let notification = {
+            type: "Complain",
+            title: `The status of the complain id : ${complain_id} has been changed to ${status}`,
+            description: `${reply}`,
+            notification_to: account_no,
+            notification_from: "Admin",
+            link: "#",
+          };
+          notify.makeNotification(notification, (error, results) => {
+            if (results == "success") {
+              db.start.query(
+                "SELECT * FROM complain INNER JOIN customer ON complain.account_no = customer.account_no WHERE complain_id = ?",
+                [complain_id],
+                (error, results) => {
+                  if (!error) {
+                    return res.render("admin/view_complaint", { results });
+                  } else {
+                    console.log(error);
+                  }
+                }
+              );
+            }
+          });
+        }
+      }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 //change the status of the user
+
+//change password of Admin
+exports.changePW = (req, res) => {
+  let { current_pw, new_pw, confirm_pw } = req.body;
+  try {
+    if (!current_pw || !new_pw || !confirm_pw) {
+      return res.status(400).render("./admin/change_password", {
+        messageWarning: "Please provide required details",
+        title: "Change Password",
+      });
+    }
+    if (new_pw != confirm_pw) {
+      return res.status(400).render("./admin/change_password", {
+        messageWarning: "New Passwords do not match",
+        title: "Change Password",
+      });
+    }
+    db.start.query(
+      "SELECT password FROM admin WHERE id = 1",
+      async (error, results) => {
+        if (!error) {
+          if (!(await bcrypt.compare(current_pw, results[0].password))) {
+            return res.status(400).render("./admin/change_password", {
+              messageWarning: "Current Password is incorrect",
+              title: "Change Password",
+            });
+          } else {
+            let hashedPW = await bcrypt.hash(new_pw, 10);
+            db.start.query(
+              "UPDATE admin SET password =? WHERE id=1",
+              [hashedPW],
+              (error, results) => {
+                if (!error) {
+                  return res.status(200).render("./admin/change_password", {
+                    message: "Password Updated",
+                    title: "Change Password",
+                  });
+                }
+              }
+            );
+          }
+        }
+      }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 //* Pricing Management */
 //**********************/
 
 //add pricing
 exports.addPricing = (req, res) => {
-  let { tariff, b1_30, b31_60, b61_90, b91_105,fixed_price } = req.body;
+  let {
+    tariff,
+    b1_30,
+    b31_60,
+    b61_90,
+    b91_120,
+    b121_180,
+    more_180,
+    fixed_price,
+  } = req.body;
   try {
     db.start.query(
       "INSERT INTO pricing SET ?",
@@ -330,8 +515,10 @@ exports.addPricing = (req, res) => {
           b1_30: b1_30,
           b31_60: b31_60,
           b61_90: b61_90,
-          b91_105: b91_105,
-          fixed_price: fixed_price
+          b91_120: b91_120,
+          b121_180: b121_180,
+          more_180: more_180,
+          fixed_price: fixed_price,
         },
       ],
       (error, results) => {
@@ -386,37 +573,52 @@ exports.editPricing = (req, res) => {
 
 //update pricing
 exports.updatePricing = (req, res) => {
-  let { tariff, b1_30, b31_60, b61_90, b91_105,fixed_price } = req.body;
+  let {
+    tariff,
+    b1_30,
+    b31_60,
+    b61_90,
+    b91_120,
+    b121_180,
+    more_180,
+    fixed_price,
+  } = req.body;
   try {
-    db.start.query("UPDATE pricing SET ? WHERE tariff = ?",
-    [{
+    db.start.query(
+      "UPDATE pricing SET ? WHERE tariff = ?",
+      [
+        {
           b1_30: b1_30,
           b31_60: b31_60,
           b61_90: b61_90,
-          b91_105: b91_105,
-          fixed_price: fixed_price
-    },
-    tariff
-  ],(error,results)=>{
-    if(!error){
-      try {
-        db.start.query(
-          "SELECT * FROM pricing WHERE tariff = ?",
-          [tariff],
-          (error, results) => {
-            if (!error) {
-              res.render("admin/edit_pricing", { results,
-                message: "Tariff has been updated!", });
-            } else {
-              console.log(error);
-            }
-          }
-        );
-      } catch (error) {
-        
+          b91_120: b91_120,
+          b121_180: b121_180,
+          more_180: more_180,
+          fixed_price: fixed_price,
+        },
+        tariff,
+      ],
+      (error, results) => {
+        if (!error) {
+          try {
+            db.start.query(
+              "SELECT * FROM pricing WHERE tariff = ?",
+              [tariff],
+              (error, results) => {
+                if (!error) {
+                  res.render("admin/edit_pricing", {
+                    results,
+                    message: "Tariff has been updated!",
+                  });
+                } else {
+                  console.log(error);
+                }
+              }
+            );
+          } catch (error) {}
+        }
       }
-    }
-  })
+    );
   } catch (error) {
     console.log(error);
   }
@@ -510,9 +712,10 @@ exports.viewAllAreaOffices = (req, res) => {
   try {
     db.start.query("SELECT * FROM areaoffice", (error, results) => {
       if (!error) {
-        
-        res.render("./admin/area_offices", { Data: results,
-        heading:"Area Officers" });
+        res.render("./admin/area_offices", {
+          Data: results,
+          heading: "Area Officers",
+        });
       } else {
         console.log(error);
       }
@@ -549,8 +752,7 @@ exports.editAreaOffice = (req, res) => {
       [req.params.id],
       (error, results) => {
         if (!error) {
-          console.log(results);
-          res.render("./admin/edit_areaoffice", { Data: results });
+          res.render("./admin/edit_area_office", { Data: results });
         } else {
           console.log(error);
         }
@@ -565,8 +767,10 @@ exports.editAreaOffice = (req, res) => {
 exports.updateAreaOffice = (req, res) => {
   const { area_id, area_name, address, telephone_no, district, province } =
     req.body;
+  console.log(req.body);
   try {
-    db.start.query("UPDATE areaoffice SET ? WHERE area_id = ?"),
+    db.start.query(
+      "UPDATE areaoffice SET ? WHERE area_id = ?",
       [
         {
           area_name: area_name,
@@ -575,18 +779,17 @@ exports.updateAreaOffice = (req, res) => {
           district: district,
           province: province,
         },
-        req.params.id,
+        area_id,
       ],
       (error, results) => {
         if (!error) {
           try {
             db.start.query(
               "SELECT * FROM areaoffice WHERE area_id = ?",
-              [req.params.id],
+              [area_id],
               (error, results) => {
                 if (!error) {
-                  console.log(results);
-                  res.render("./admin/edit_areaoffice", {
+                  res.render("./admin/edit_area_office", {
                     Data: results,
                     message: `${area_id} has been updated!`,
                   });
@@ -601,7 +804,8 @@ exports.updateAreaOffice = (req, res) => {
         } else {
           console.log(error);
         }
-      };
+      }
+    );
   } catch (error) {
     console.log(error);
   }
@@ -635,10 +839,12 @@ exports.searchAreaOffice = (req, res) => {
       ["%" + searchTerm + "%", "%" + searchTerm + "%", "%" + searchTerm + "%"],
       (error, results) => {
         if (!error) {
-          res.render("./admin/area_offices", { Data: results, 
-            searchTerm:req.query.search,
-            heading:`Search results: "${searchTerm}"`, 
-            title:"Search Results" });
+          res.render("./admin/area_offices", {
+            Data: results,
+            searchTerm: req.query.search,
+            heading: `Search results: "${searchTerm}"`,
+            title: "Search Results",
+          });
         } else {
           console.log(error);
         }
@@ -651,25 +857,56 @@ exports.searchAreaOffice = (req, res) => {
 
 //reset Password Area Office
 exports.resetPWAreaOffice = (req, res) => {
+  let { area_id, password, conf_password } = req.body;
   try {
+    db.start.query(
+      "SELECT * FROM areaoffice WHERE area_id = ?",
+      [area_id],
+      async (error, Data) => {
+        if (!error) {
+          let hashedPW = await bcrypt.hash(password, 10);
+          db.start.query(
+            "UPDATE areaoffice SET password = ? WHERE area_id = ?",
+            [hashedPW, area_id],
+            (error, results) => {
+              if (!error) {
+                return res.status(200).render("./admin/edit_area_office", {
+                  mSuccess: "Password Updated",
+                  title: "Change Password",
+                  Data,
+                });
+              }
+            }
+          );
+        }
+      }
+    );
   } catch (error) {
     console.log(error);
   }
 };
 
 //**Meter Reader Management */
-
-//add meter reader
-exports.addMeterReader = (req,res)=>{
+//render add meter reader
+exports.renderAddReader = (req, res) => {
   try {
-    const {
-      reader_id,
-      name,
-      contact_no,
-      area_id,
-      password,
-      conf_password,
-    } = req.body;
+    db.start.query(
+      "SELECT area_id, area_name FROM areaoffice",
+      (error, results) => {
+        if (!error) {
+          return res.render("admin/add_meter_reader", { officeList: results });
+        } else {
+          console.log(error);
+        }
+      }
+    );
+  } catch (error) {}
+};
+//add meter reader
+exports.addMeterReader = (req, res) => {
+  try {
+    const { reader_id, name, contact_no, area_id, password, conf_password } =
+      req.body;
     //check empty or not
     if (
       !reader_id ||
@@ -732,29 +969,24 @@ exports.addMeterReader = (req,res)=>{
     } catch (error) {
       console.log(error);
     }
-  } catch (error) {
-    
-  }
-}
+  } catch (error) {}
+};
 //view all Meter Readers
 exports.viewAllMeterReaders = (req, res) => {
   try {
-    db.start.query("SELECT * FROM meter_reader INNER JOIN areaoffice ON meter_reader.area_id = areaoffice.area_id", (error, results) => {
-      if (!error) {
-        res.render("./admin/meter_readers", { Data: results,
-          heading:"Meter Readers" });
-      } else {
-        console.log(error);
+    db.start.query(
+      "SELECT * FROM meter_reader INNER JOIN areaoffice ON meter_reader.area_id = areaoffice.area_id",
+      (error, results) => {
+        if (!error) {
+          res.render("./admin/meter_readers", {
+            Data: results,
+            heading: "Meter Readers",
+          });
+        } else {
+          console.log(error);
+        }
       }
-    });
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-//view Meter Reader
-exports.viewMeterReader = (req, res) => {
-  try {
+    );
   } catch (error) {
     console.log(error);
   }
@@ -764,12 +996,20 @@ exports.viewMeterReader = (req, res) => {
 exports.editMeterReader = (req, res) => {
   try {
     db.start.query(
-      "SELECT * FROM meter_reader WHERE reader_id = ?",
+      "SELECT meter_reader.*,areaoffice.area_name FROM meter_reader INNER JOIN areaoffice ON  meter_reader.area_id = areaoffice.area_id WHERE reader_id = ?",
       [req.params.id],
-      (error, results) => {
+      (error, Data) => {
         if (!error) {
-          console.log(results);
-          res.render("./admin/edit_meter_reader", { Data: results });
+          db.start.query(
+            "SELECT area_id, area_name FROM areaoffice",
+            (error, officeList) => {
+              if (!error) {
+                res.render("./admin/edit_meter_reader", { officeList, Data });
+              } else {
+                console.log(error);
+              }
+            }
+          );
         } else {
           console.log(error);
         }
@@ -800,26 +1040,65 @@ exports.deleteMeterReader = (req, res) => {
 exports.searchMeterReader = (req, res) => {
   const searchTerm = req.query.search;
   try {
-    db.start.query("SELECT * FROM meter_reader INNER JOIN areaoffice ON meter_reader.area_id = areaoffice.area_id WHERE reader_id LIKE ? OR name LIKE ? OR area_name LIKE ?",
-    ["%" + searchTerm + "%", "%" + searchTerm + "%", "%" + searchTerm + "%"], (error, results) => {
-      if (!error) {
-        res.render("./admin/meter_readers", { Data: results,
-          searchTerm:req.query.search,
-          heading:`Search results: "${searchTerm}"`,
-        title:"Search results" });
-      } else {
-        console.log(error);
+    db.start.query(
+      "SELECT * FROM meter_reader INNER JOIN areaoffice ON meter_reader.area_id = areaoffice.area_id WHERE reader_id LIKE ? OR name LIKE ? OR area_name LIKE ?",
+      ["%" + searchTerm + "%", "%" + searchTerm + "%", "%" + searchTerm + "%"],
+      (error, results) => {
+        if (!error) {
+          res.render("./admin/meter_readers", {
+            Data: results,
+            searchTerm: req.query.search,
+            heading: `Search results: "${searchTerm}"`,
+            title: "Search results",
+          });
+        } else {
+          console.log(error);
+        }
       }
-    });
+    );
   } catch (error) {
     console.log(error);
   }
 };
 
+//render reset Password meter reader
+exports.renderRestPWMR = (req, res) => {
+  try {
+    db.start.query(
+      "SELECT * FROM meter_reader WHERE reader_id = ?",
+      [req.params.id],
+      (error, Data) => {
+        if (!error) {
+          return res.render("admin/update_pw_meter_reader", { reader_id: Data[0].reader_id });
+        }
+      }
+    );
+  } catch (error) {}
+};
+
 //reset Password meter reader
 exports.resetPWMeterReader = (req, res) => {
+  let { reader_id, password, conf_password } = req.body;
   try {
+    bcrypt.hash(password, 10).then(function(hash) {
+      db.start.query(
+        "UPDATE meter_reader SET password = ? WHERE reader_id = ?",
+        [hash, reader_id],
+        (error, results) => {
+          if (!error) {
+            return res.status(200).render("./admin/update_pw_meter_reader", {
+              mSuccess: "Password Updated",
+              title: "Change Password",
+              reader_id
+            });
+          }
+        }
+      );
+  });
+    
+    
   } catch (error) {
     console.log(error);
   }
+
 };

@@ -96,7 +96,7 @@
 
     <body>
         <div class="container">
-            <%- include('../partials/admin_nav.ejs') %>  
+            <%- include('../partials/officer_nav.ejs') %>  
             <!--main-->
             <div class="main">
                 <div class="topbar">
@@ -105,59 +105,70 @@
                     </div>
                    
                     <!--User Image-->
-                    <div class="user">
-                        
+                    <div>
+                       
                     </div>
                 </div>
                 <main>
                     <section class="details">
                         <div class="recentDetails">
-                            <form>
-                            <h1>Customer : <% if(typeof customerData[0] !="undefined" && customerData[0]) {%><%= customerData[0].account_no %><% } %></h1>
-                            <br>
+                            <h1>Complaint : <% if(typeof results[0].complain_id !="undefined" && results[0].complain_id) {%><%= results[0].complain_id %><% } %></h1>
+
+                            <form action="/area_office/reply_complaint" method="post">
+                                <input type="hidden" name="complain_id" value="<% if(typeof results[0].complain_id !="undefined" && results[0].complain_id) {%><%= results[0].complain_id %><% } %>">
+                                <h3>User Details</h3><br>
                                 <div class="form-group">
                                     <label for="firstname">Name</label>
-                                    <p class="form-element"><% if(typeof customerData[0].name !="undefined" && customerData[0].name) {%><%= customerData[0].name %><% } %></p>
+                                    <p class="form-element"><% if(typeof results[0].name !="undefined" && results[0].name) {%><%= results[0].name %><% } %></p>
                                 </div>
                                 <div class="form-group">
                                     <label for="accountno">Account No</label>
-                                    <p class="form-element"><% if(typeof customerData[0].account_no !="undefined" && customerData[0].account_no) {%><%= customerData[0].account_no %><% } %></p>
-                                </div>
-                                <div class="form-group">
-                                    <label>Username</label>
-                                    <p class="form-element"><% if(typeof customerData[0].username !="undefined" && customerData[0].username) {%><%= customerData[0].username %><% } %></p>
-                                </div>
-                                <div class="form-group">
-                                    <label>NIC</label>
-                                    <p class="form-element"><% if(typeof customerData[0].nic !="undefined" && customerData[0].nic) {%><%= customerData[0].nic %><% } %></p>
+                                    <input type="hidden" name="account_no" value="<% if(typeof results[0].account_no !="undefined" && results[0].account_no) {%><%= results[0].account_no %><% } %>">
+                                    <p class="form-element"><% if(typeof results[0].account_no !="undefined" && results[0].account_no) {%><%= results[0].account_no %><% } %></p>
                                 </div>
                                 <div class="form-group">
                                     <label for="address">Address</label>
-                                    <P class="form-element"><% if(typeof customerData[0].address !="undefined" && customerData[0].address) {%><%= customerData[0].address %><% } %></P>
-                                </div>
-                                <div class="form-group">
-                                    <label>E-mail</label>
-                                    <p class="form-element"><% if(typeof customerData[0].email !="undefined" && customerData[0].email) {%><%= customerData[0].email %><% } %></p>
+                                    <P class="form-element"><% if(typeof results[0].address !="undefined" && results[0].address) {%><%= results[0].address %><% } %></P>
                                 </div>
                                 <div class="form-group">
                                     <label for="contact">Contact No</label>
-                                    <p class="form-element"><% if(typeof customerData[0].mobile_no !="undefined" && customerData[0].mobile_no) {%><%= customerData[0].mobile_no %><% } %></p>
+                                    <p class="form-element"><% if(typeof results[0].mobile_no !="undefined" && results[0].mobile_no) {%><%= results[0].mobile_no %><% } %></p>
+                                </div>
+
+                                <h3>Complaint Details</h3><br>
+                                <div class="form-group">
+                                    <label for="type">Type</label>
+                                    <P class="form-element"><% if(typeof results[0].type !="undefined" && results[0].type) {%><%= results[0].type %><% } %></P>
                                 </div>
                                 <div class="form-group">
-                                    <label for="contact">Area Office</label>
-                                    <p class="form-element"><% if(typeof customerData[0].area_name !="undefined" && customerData[0].area_name) {%><%= customerData[0].area_name %><% } %></p>
-                                </div>
-                                <div class="form-group">
-                                    <label for="contact">Current Reading</label>
-                                    <p class="form-element"><% if(typeof customerData[0].current_reading !="undefined" && customerData[0].current_reading) {%><%= customerData[0].current_reading %><% } %></p>
-                                </div>
-                                <div class="form-group">
-                                    <label for="contact">Tariff</label>
-                                    <p class="form-element"><% if(typeof customerData[0].tariff !="undefined" && customerData[0].tariff) {%><%= customerData[0].tariff %><% } %></p>
+                                    <label for="note">Note</label>
+                                    <p class="form-element"><% if(typeof results[0].description !="undefined" && results[0].description) {%><%= results[0].description %><% } %></p>
                                 </div>
                                 
+                                <div class="form-group">
+                                    <label for="note">Status</label>
+                                    <p class="form-element"><% if(typeof results[0].status !="undefined" && results[0].status) {%><%= results[0].status %><% } %></p>
+                                </div>
+                                <div class="form-group">
+                                    </div>
+                                <div class="form-group">
+                                    <label for="status">Change Status</label>
+                                    <select class="form-element" name="status">
+                                        <option value="Select status">Select status</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Completed">Completed</option>
+                                    </select>
+
+                                </div>
+                                <div class="form-group full">
+                                    <label for="message">Type a reply here</label>
+                                    <textarea name="reply" id="message" class="form-element" placeholder="Type your reply here ....."><% if(typeof results[0].reply !="undefined" && results[0].reply) {%><%= results[0].reply %><% } %></textarea>
+                                </div>
+                                <div class="submit-group">
+                                    <input type="submit" value="SEND MESSAGE" />
+                                </div>
+                            </form>
                         </div>
-                    </form>
                     </section>
                 </main>
 

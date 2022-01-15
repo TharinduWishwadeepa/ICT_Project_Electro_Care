@@ -14,11 +14,25 @@
                 <div class="row">
                     <div class="row">
                         <div class="col-8">
-                            <h5><%= data.type %></h5>
+                            <h6><%= data.type %></h6>
                         </div>
-                        <div class="col-4 text-end">
-                            <span class="badge bg-info"><%= data.status %></span>
-                        </div>
+                       
+                            <% if(data.status == "Pending"){ %>
+                            <div class="col-4 text-end">    
+                                <span class="badge bg-danger"><%= data.status %></span>
+                            </div>
+                            <% } %>  
+                        
+                            <% if(data.status == "In Progress"){ %>
+                                <div class="col-4 text-end">  
+                                <span class="badge bg-warning"><%= data.status %></span>
+                                </div>
+                            <% } %>  
+                            <% if(data.status == "Completed"){ %>
+                                <div class="col-4 text-end">  
+                                <span class="badge bg-success"><%= data.status %></span>
+                                </div>
+                            <% } %>    
                         <p style="white-space: pre-wrap"><%= data.description %></p> 
                         <span style="font-size:x-small;" class="text-end"><i class="bi bi-clock"></i> <%= moment(data.datetime).fromNow() %></span>
                     </div>  

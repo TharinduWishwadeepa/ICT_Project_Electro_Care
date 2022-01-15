@@ -110,10 +110,20 @@ router.get('/edit_pricing/:id',authController.isLoggedIn, (req,res)=>{
     }
 });
 
-router.get('/add_areaoffice',authController.isLoggedIn, (req,res)=>{
+router.get('/add_area_office',authController.isLoggedIn, (req,res)=>{
     if(req.user){
         res.locals.title = "Add Area Office";
-        res.render('./admin/add_areaoffice');
+        res.render('./admin/add_area_office');
+    }
+    else {
+        res.redirect('./login');
+    }
+});
+
+router.get('/edit_area_office/:id',authController.isLoggedIn, (req,res)=>{
+    if(req.user){
+        res.locals.title = "Edit Area Office";
+        adminTasks.editAreaOffice(req,res);
     }
     else {
         res.redirect('./login');
@@ -130,10 +140,49 @@ router.get('/meter_readers',authController.isLoggedIn, (req,res)=>{
     }
 });
 
+router.get('/add_meter_reader',authController.isLoggedIn, (req,res)=>{
+    if(req.user){
+        res.locals.title = "Meter Readers";
+        adminTasks.renderAddReader(req,res);
+    }
+    else {
+        res.redirect('../login');
+    }
+});
+
+router.get('/edit_meter_reader/:id',authController.isLoggedIn, (req,res)=>{
+    if(req.user){
+        res.locals.title = "Edit Meter Reader";
+        adminTasks.editMeterReader(req,res);
+    }
+    else {
+        res.redirect('./login');
+    }
+});
+
+router.get("/update_pw_meter_reader/:id", authController.isLoggedIn, (req, res) => {
+    if (req.user) {
+      res.locals.title = "Change Password";
+      adminTasks.renderRestPWMR(req,res);
+  } else {
+      res.redirect("/admin");
+    }
+  });
+
 router.get('/complaints', authController.isLoggedIn,(req,res)=>{
     if(req.user){
         res.locals.title = "Complaints";
         adminTasks.viewComplaints(req,res);
+    }
+    else {
+        res.redirect('../login');
+    }
+});
+
+router.get('/view_complaint/:comp_id', authController.isLoggedIn,(req,res)=>{
+    if(req.user){
+        res.locals.title = "Complaint";
+        adminTasks.viewComplain(req,res);
     }
     else {
         res.redirect('../login');
@@ -155,8 +204,15 @@ router.get('/search_meter_readers', adminTasks.searchMeterReader);
 router.get('/search_area_offices', adminTasks.searchAreaOffice);
 
 //posts
+router.post('/change_password',adminTasks.changePW);
+router.post('/add_customer', adminTasks.addCustomer);
 router.post('/add_areaoffice', adminTasks.addAreaOffice);
+router.post('/update_customer',adminTasks.updateCustomer);
 router.post('/update_pricing', adminTasks.updatePricing);
 router.post('/add_pricing', adminTasks.addPricing);
+router.post('/reply_complaint',adminTasks.replyComplaint);
+router.post('/update_area_office',adminTasks.updateAreaOffice);
+router.post('/update_pw_area_office',adminTasks.resetPWAreaOffice);
+router.post('/update_pw_meter_reader',adminTasks.resetPWMeterReader);
 
 module.exports = router;
