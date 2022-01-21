@@ -20,6 +20,7 @@
               <div class="mt-3">
                   <h5>Previous Bills</h5>
               </div>
+              <% if(typeof message != "undefined" && message) {%><p class="text-center"><%= message %> </p><% } %> 
               <% if(typeof billHistory != "undefined" && billHistory.length != 0){ var i=1; billHistory.forEach(function(data){%> 
               <a href="/view_bill/<%= data.bill_id %>" style="text-decoration: none; color: black;">
                 <div class="card shadow p-3 mb-3" style="border-radius: 15px;background-color: #E5E5E5;">

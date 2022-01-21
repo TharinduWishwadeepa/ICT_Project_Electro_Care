@@ -162,7 +162,7 @@ router.get('/bill_history',authController.isLoggedIn, (req,res)=>{
             return res.render("bill_history",{customerData,billHistory})
           }
           else if (billHistory.length == 0){
-            return res.render("bill_history",{message:"No Bill history to show!"})
+            return res.render("bill_history",{customerData, message:"No Bill history to show!"})
           }
           else if(error){
             console.log(error);

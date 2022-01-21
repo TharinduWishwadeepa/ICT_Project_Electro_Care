@@ -351,42 +351,56 @@ exports.confirmMeter = (req,res)=>{
                 readers: ["code_128_reader"] // List of active readers
             },
         }, function(result) {
-            if(result.codeResult) {
-              let acc_formatted = result.codeResult.code.slice(3, 13);
-              if(acc_formatted == account_no){
-                //if the meter is correct
-                res.render("upload_image", {
-                  alertType:"info",
-                  alertTitle:"Info !",
-                  url:results.secure_url,
-                  title: "Upload Meter Reading",
-                  text:"Your Account No is Correct!",
-                });
-              }
-              else{
-                //if the meter is fake
-                res.render("upload_image", {
-                  alert:"error",
-                  alertTitle:"Ooops !",
-                  title: "Upload Meter Reading",
-                  text:"Invalid Electricity Meter !",
-                  link:"/upload_image",
-                  buttonType:"btn-secondary",
-                  buttonTxt:"Try Again"
-                });
-              }  
-            } else {
-              //if barcode read fails
+            if(typeof result == "undefined"){
               res.render("upload_image", {
                 alert:"error",
                 alertTitle:"Ooops !",
                 title: "Upload Meter Reading",
-                text:"Electricity Meter Not Detected!",
+                text:"Cannot Detect Electricity Meter !",
                 link:"/upload_image",
                 buttonType:"btn-secondary",
                 buttonTxt:"Try Again"
               });
             }
+            else{
+              if(result.codeResult) {
+                let acc_formatted = result.codeResult.code.slice(3, 13);
+                if(acc_formatted == account_no){
+                  //if the meter is correct
+                  res.render("upload_image", {
+                    alertType:"success",
+                    alertTitle:"Info !",
+                    url:results.secure_url,
+                    title: "Upload Meter Reading",
+                    text:"Your Account No is Correct!",
+                  });
+                }
+                else{
+                  //if the meter is fake
+                  res.render("upload_image", {
+                    alert:"error",
+                    alertTitle:"Ooops !",
+                    title: "Upload Meter Reading",
+                    text:"Invalid Electricity Meter !",
+                    link:"/upload_image",
+                    buttonType:"btn-secondary",
+                    buttonTxt:"Try Again"
+                  });
+                }  
+              } else {
+                //if barcode read fails
+                res.render("upload_image", {
+                  alert:"error",
+                  alertTitle:"Ooops !",
+                  title: "Upload Meter Reading",
+                  text:"Electricity Meter Not Detected!",
+                  link:"/upload_image",
+                  buttonType:"btn-secondary",
+                  buttonTxt:"Try Again"
+                });
+              }
+            }
+            
         });
       } catch (error) {
         console.log(error)
@@ -516,7 +530,15 @@ exports.billThisMonth = (req,res) => {
       [account_no],
       (error, bill_results) => {
         if (bill_results.length == 0) {
-          console.log(error)
+          res.render("upload_image", {
+            alert:"error",
+            alertTitle:"Ooops !",
+            title: "Upload Image",
+            text:"Cannot view the bill for this month! Please submit the meter reader image",
+            link:"/upload_image",
+            buttonType:"btn-secondary",
+            buttonTxt:"Upload Image"
+          });
         } else if (bill_results.length == 1) {
           this.getCustomerData(account_no,(error,customerData)=>{
             if(!error){
