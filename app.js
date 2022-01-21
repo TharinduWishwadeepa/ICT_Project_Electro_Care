@@ -97,4 +97,4 @@ app.use('/area_office/area_office_auth',require('./routes/area_office_auth'));
 const publicDir = path.join(__dirname,'./public');
 app.use(express.static(publicDir));
 
-app.listen(8080);
+app.listen(8000);
